@@ -1,0 +1,147 @@
+/* Theme colors for flower shop */
+:root {
+  --primary-color: #ff758c;
+  --secondary-color: #ff7eb3;
+  --accent-color: #ffb6c1;
+  --text-color: #4a4a4a;
+  --light-bg: #fff5f6;
+}
+
+/* Global styles */
+body {
+  font-family: 'Roboto', sans-serif;
+  background: linear-gradient(135deg, var(--light-bg), #fff);
+  margin: 0;
+  padding: 0;
+  color: var(--text-color);
+}
+
+/* Container for main admin area */
+.body-admin {
+  max-width: 1200px;
+  margin: 30px auto;
+  background-color: #fff;
+  padding: 40px;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(255, 117, 140, 0.1);
+  transition: box-shadow 0.3s ease;
+}
+
+.body-admin:hover {
+  box-shadow: 0 12px 40px rgba(255, 117, 140, 0.15);
+}
+
+/* Card styling improvements */
+.card {
+  border: none;
+  border-radius: 12px;
+  box-shadow: 0 8px 20px rgba(255, 117, 140, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 30px rgba(255, 117, 140, 0.15);
+}
+
+/* Button styling improvements */
+.btn-primary {
+  background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+  border: none;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+  opacity: 0.9;
+  transform: translateY(-2px);
+}
+
+/* Table styles */
+.table {
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.table thead th {
+  background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+  color: white;
+  border: none;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--light-bg);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--accent-color);
+  border-radius: 4px;
+}
+
+/* Toast customization */
+.Toastify__toast {
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(255, 117, 140, 0.15);
+}
+
+/* Form controls */
+.form-control:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 0.2rem rgba(255, 117, 140, 0.25);
+}
+
+.product-management {
+  min-height: 100vh;
+  background-color: #f8f9fa;
+}
+
+.card {
+  transition: all 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(255, 117, 140, 0.1) !important;
+}
+
+.form-control:focus, .form-select:focus {
+  border-color: #ff758c;
+  box-shadow: 0 0 0 0.2rem rgba(255, 117, 140, 0.25);
+}
+
+.table img {
+  transition: transform 0.3s ease;
+}
+
+.table img:hover {
+  transform: scale(1.1);
+}
+
+.btn-gradient {
+  background: linear-gradient(135deg, #ff758c 0%, #ff7eb3 100%);
+  border: none;
+  color: white;
+}
+
+.btn-gradient:hover {
+  opacity: 0.9;
+}
+
+.badge {
+  padding: 0.5em 1em;
+}
+
+.table th {
+  font-weight: 600;
+  color: #495057;
+}
+
+.table td {
+  vertical-align: middle;
+}

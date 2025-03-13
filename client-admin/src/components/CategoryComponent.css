@@ -1,0 +1,70 @@
+.category-page {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    padding: 2rem 0;
+}
+
+.MuiTableRow-root.Mui-selected {
+    background-color: rgba(255, 107, 107, 0.08) !important;
+}
+
+.MuiTableRow-root.Mui-selected:hover {
+    background-color: rgba(255, 107, 107, 0.12) !important;
+}
+
+.MuiCircularProgress-root {
+    color: #FF6B6B !important;
+}
+
+.Toastify__toast--success {
+    background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%) !important;
+}
+
+.Toastify__toast--error {
+    background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%) !important;
+}
+
+.Toastify__toast--warning {
+    background: linear-gradient(135deg, #f1c40f 0%, #f39c12 100%) !important;
+}
+
+.Toastify__toast--info {
+    background: linear-gradient(135deg, #3498db 0%, #2980b9 100%) !important;
+}
+.sortable-header {
+    cursor: pointer;
+    user-select: none;
+    transition: background-color 0.2s ease;
+  }
+  
+  .sortable-header:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+  }
+  
+  .sort-icon {
+    display: flex;
+    align-items: center;
+    margin-left: 8px;
+  }
+  
+  .sort-icon svg {
+    transition: all 0.3s ease;
+  }
+  
+  .sort-icon svg.asc {
+    color: #FF6B6B;
+    transform: rotate(0deg);
+  }
+  
+  .sort-icon svg.desc {
+    color: #FF6B6B;
+    transform: rotate(180deg);
+  }
+  
+  .sort-icon svg.text-muted {
+    opacity: 0.3;
+  }
+  
+  .sortable-header:hover .sort-icon svg.text-muted {
+    opacity: 0.6;
+  }
