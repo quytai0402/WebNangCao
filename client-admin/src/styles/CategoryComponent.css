@@ -1,0 +1,167 @@
+.category-page {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    padding: 2rem 0;
+}
+
+.MuiTableRow-root.Mui-selected {
+    background-color: rgba(255, 107, 107, 0.08) !important;
+}
+
+.MuiTableRow-root.Mui-selected:hover {
+    background-color: rgba(255, 107, 107, 0.12) !important;
+}
+
+.MuiTableRow-root {
+    transition: all 0.3s ease;
+}
+
+.MuiTableRow-root:hover {
+    background-color: rgba(255, 107, 107, 0.05) !important;
+}
+
+.MuiCircularProgress-root {
+    color: #FF6B6B !important;
+}
+
+.Toastify__toast--success {
+    background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%) !important;
+    border-radius: 12px !important;
+    box-shadow: 0 8px 16px rgba(46, 204, 113, 0.2) !important;
+}
+
+.Toastify__toast--error {
+    background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%) !important;
+    border-radius: 12px !important;
+    box-shadow: 0 8px 16px rgba(231, 76, 60, 0.2) !important;
+}
+
+.Toastify__toast--warning {
+    background: linear-gradient(135deg, #f1c40f 0%, #f39c12 100%) !important;
+    border-radius: 12px !important;
+    box-shadow: 0 8px 16px rgba(243, 156, 18, 0.2) !important;
+}
+
+.Toastify__toast--info {
+    background: linear-gradient(135deg, #3498db 0%, #2980b9 100%) !important;
+    border-radius: 12px !important;
+    box-shadow: 0 8px 16px rgba(52, 152, 219, 0.2) !important;
+}
+
+.sortable-header {
+    cursor: pointer;
+    user-select: none;
+    transition: background-color 0.2s ease;
+}
+  
+.sortable-header:hover {
+    background-color: rgba(255, 107, 107, 0.05);
+}
+  
+.sort-icon {
+    display: flex;
+    align-items: center;
+    margin-left: 8px;
+}
+  
+.sort-icon svg {
+    transition: all 0.3s ease;
+}
+  
+.sort-icon svg.asc {
+    color: #FF6B6B;
+    transform: rotate(0deg);
+}
+  
+.sort-icon svg.desc {
+    color: #FF6B6B;
+    transform: rotate(180deg);
+}
+  
+.sort-icon svg.text-muted {
+    opacity: 0.3;
+}
+  
+.sortable-header:hover .sort-icon svg.text-muted {
+    opacity: 0.6;
+}
+
+.MuiCard-root {
+    transition: all 0.3s ease;
+}
+
+.MuiCard-root:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+}
+
+.MuiButton-root {
+    transition: all 0.3s ease !important;
+}
+
+.MuiButton-contained:not(.Mui-disabled):active {
+    transform: translateY(2px) !important;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1) !important;
+}
+
+.MuiOutlinedInput-root.Mui-focused {
+    box-shadow: 0 0 0 3px rgba(255, 107, 107, 0.2) !important;
+}
+
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #ddd;
+    border-radius: 10px;
+    transition: all 0.3s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #FF8E53;
+}
+
+.MuiChip-root {
+    transition: all 0.3s ease !important;
+}
+
+.MuiChip-root:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.MuiTableCell-root {
+    transition: all 0.3s ease;
+}
+
+.gradient-header-shine {
+    position: relative;
+    overflow: hidden;
+}
+
+.gradient-header-shine::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 50%;
+    height: 100%;
+    background: linear-gradient(90deg, 
+        rgba(255,255,255,0) 0%, 
+        rgba(255,255,255,0.3) 50%, 
+        rgba(255,255,255,0) 100%);
+    animation: shine 3s infinite linear;
+}
+
+@keyframes shine {
+    to {
+        left: 150%;
+    }
+}

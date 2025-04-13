@@ -1,0 +1,200 @@
+.comment-management {
+  background-color: #f9f9f9;
+}
+
+.comment-card {
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+  border: none;
+}
+
+.comment-header {
+  background: linear-gradient(135deg, #ff7eb3 0%, #ff758c 100%);
+  padding: 16px 20px;
+  border: none;
+  color: white;
+}
+
+.comment-header h4 {
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.comment-table {
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.comment-table thead th {
+  background-color: rgba(255, 123, 123, 0.05);
+  border-bottom: 2px solid rgba(255, 123, 123, 0.2);
+  color: #555;
+  font-weight: 600;
+  padding: 12px;
+}
+
+.comment-table tbody tr {
+  transition: all 0.2s;
+}
+
+.comment-table tbody tr:hover {
+  background-color: rgba(255, 123, 123, 0.05);
+}
+
+.comment-table td {
+  padding: 12px;
+  vertical-align: middle;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.product-link {
+  color: #ff758c !important;
+  text-decoration: none;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.product-link:hover {
+  color: #ff4d6a !important;
+  text-decoration: underline;
+}
+
+.flower-icon-container {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #ff7eb3 0%, #ff758c 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  margin-right: 12px;
+}
+
+.filter-container {
+  padding: 16px;
+  background-color: rgba(255, 255, 255, 0.8);
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  margin-bottom: 20px;
+}
+
+.reply-card {
+  transition: all 0.3s ease;
+  border-left: 4px solid rgba(255, 123, 123, 0.5) !important;
+}
+
+.nested-reply-card {
+  border-left: 4px solid rgba(123, 123, 255, 0.5) !important;
+}
+
+.reply-content {
+  background-color: rgba(249, 249, 249, 0.8) !important;
+  border-radius: 8px;
+}
+
+.mention-tag {
+  color: #ff758c;
+  font-weight: 500;
+}
+
+.delete-btn {
+  color: #ff758c;
+  border-color: #ff758c;
+}
+
+.delete-btn:hover {
+  color: white;
+  background-color: #ff758c;
+  border-color: #ff758c;
+}
+
+/* Pagination styling */
+.pagination {
+  margin-bottom: 0;
+}
+
+.pagination .page-link {
+  color: #ff758c;
+  border: 1px solid rgba(255, 123, 123, 0.2);
+  padding: 8px 15px;
+}
+
+.pagination .page-item.active .page-link {
+  background-color: #ff758c;
+  border-color: #ff758c;
+  color: white;
+}
+
+.pagination .page-link:hover {
+  background-color: rgba(255, 123, 123, 0.1);
+}
+
+/* Modal styling */
+.comment-modal .modal-header {
+  background: linear-gradient(135deg, #ff7eb3 0%, #ff758c 100%);
+  color: white;
+  border-bottom: none;
+}
+
+.comment-modal .modal-title {
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.replies-modal .modal-header {
+  background: linear-gradient(135deg, #7eb3ff 0%, #758cff 100%);
+  color: white;
+  border-bottom: none;
+}
+
+/* Flower decorations */
+.flower-decoration {
+  position: absolute;
+  font-size: 24px;
+  opacity: 0.15;
+  z-index: 0;
+}
+
+.flower-decoration-1 {
+  top: 20px;
+  right: 30px;
+}
+
+.flower-decoration-2 {
+  bottom: 20px;
+  left: 30px;
+}
+
+@keyframes floatAnimation {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.float-icon {
+  animation: floatAnimation 3s infinite ease-in-out;
+}
+
+/* Buttons */
+.btn-flower-primary {
+  background: linear-gradient(135deg, #ff7eb3 0%, #ff758c 100%);
+  border: none;
+  color: white;
+  font-weight: 500;
+  box-shadow: 0 4px 10px rgba(255, 123, 123, 0.25);
+  transition: all 0.3s ease;
+}
+
+.btn-flower-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(255, 123, 123, 0.35);
+}

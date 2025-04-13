@@ -1,0 +1,139 @@
+.product-detail-card {
+  background: white;
+  border-radius: 15px;
+  overflow: hidden;
+}
+
+.flower-gradient {
+  background: linear-gradient(135deg, #ff758c 0%, #ff7eb3 100%);
+  box-shadow: 0 4px 15px rgba(255, 117, 140, 0.2);
+}
+
+.detail-group {
+  margin-bottom: 1.5rem !important;
+}
+
+.detail-label {
+  color: #666;
+  font-weight: 600;
+  font-size: 0.9rem;
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+}
+
+.detail-input,
+.detail-select,
+.detail-file-input {
+  border: 2px solid #eee;
+  border-radius: 10px;
+  padding: 0.8rem;
+  transition: all 0.3s ease;
+}
+
+.detail-input:focus,
+.detail-select:focus {
+  border-color: rgba(255, 117, 140, 0.5);
+  box-shadow: 0 0 0 0.2rem rgba(255, 117, 140, 0.25);
+}
+
+.detail-input-readonly {
+  background: #f8f9fa !important;
+  border: 2px solid #eee;
+  border-radius: 10px;
+  padding: 0.8rem;
+  color: #666;
+}
+
+.image-preview {
+  margin-top: 1rem;
+  padding: 1rem;
+  background: #f8f9fa;
+  border-radius: 10px;
+  text-align: center;
+}
+
+.preview-image {
+  max-height: 200px;
+  border-radius: 8px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease;
+}
+
+.preview-image:hover {
+  transform: scale(1.05);
+}
+
+.action-buttons {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.8rem;
+  margin-top: 2rem;
+}
+
+.action-button {
+  padding: 0.8rem !important;
+  border-radius: 10px !important;
+  font-weight: 500 !important;
+  transition: all 0.3s ease !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border: none !important;
+}
+
+.action-button:hover {
+  transform: translateY(-2px);
+}
+
+.add-button {
+  background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%) !important;
+}
+
+.update-button {
+  background: linear-gradient(135deg, #3498db 0%, #2980b9 100%) !important;
+}
+
+.delete-button {
+  background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%) !important;
+}
+
+.clear-button {
+  background: linear-gradient(135deg, #95a5a6 0%, #7f8c8d 100%) !important;
+}
+
+.clear-header-button {
+  color: #fff !important;
+  background-color: rgba(255, 255, 255, 0.2) !important;
+  border: none !important;
+  border-radius: 50% !important;
+  width: 32px;
+  height: 32px;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  opacity: 0.8;
+  transition: all 0.2s ease !important;
+}
+
+.clear-header-button:hover {
+  background-color: rgba(255, 255, 255, 0.3) !important;
+  opacity: 1;
+  transform: rotate(15deg);
+}
+
+.action-button:disabled {
+  opacity: 0.7;
+  transform: none;
+}
+
+/* Form validation styles */
+.is-invalid {
+  border-color: #dc3545 !important;
+}
+
+.invalid-feedback {
+  color: #dc3545;
+  font-size: 0.85rem;
+  margin-top: 0.3rem;
+}
