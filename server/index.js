@@ -73,7 +73,21 @@ app.use((err, req, res, next) => {
 
 // Xử lý lỗi 404 khi không tìm thấy route
 app.use((req, res) => {
-    res.status(404).json({ success: false, message: 'Không tìm thấy route' }); // Trả về phản hồi lỗi 404
+    // Kiểm tra nếu URL bắt đầu với '/admin' hoặc không có định dạng file cụ thể (có thể là route client)
+    if (req.url.startsWith('/admin/') || (req.url.startsWith('/') && !req.url.includes('.'))) {
+        // Log request cho debugging
+        console.log(`Request không khớp với bất kỳ API nào: ${req.method} ${req.url}`);
+        
+        // Trả về response JSON để client có thể xử lý
+        res.status(200).json({ 
+            success: true, 
+            message: 'API available, but the specific route was not found. This could be a client-side route.',
+            requestedUrl: req.url
+        });
+    } else {
+        // Trả về lỗi 404 thông thường cho các request khác
+        res.status(404).json({ success: false, message: 'Không tìm thấy route' });
+    }
 });
 
 // Bắt đầu lắng nghe yêu cầu trên cổng đã chỉ định
