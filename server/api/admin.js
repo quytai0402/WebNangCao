@@ -15,7 +15,7 @@ const fs = require('fs');
 const CommentDAO = require('../models/CommentDAO');
 const mongoose = require('mongoose');
 
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 // Định nghĩa đường dẫn font sau khi require module path
 const FONT_REGULAR = path.join(__dirname, '../fonts/Roboto-Regular.ttf');
 const FONT_BOLD = path.join(__dirname, '../fonts/Roboto-Bold.ttf');

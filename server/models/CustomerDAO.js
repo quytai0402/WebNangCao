@@ -1,6 +1,6 @@
 const Models = require('./Models'); // Nhập các mô hình từ file Models
 const mongoose = require('mongoose'); // Nhập thư viện mongoose để làm việc với MongoDB
-const bcrypt = require('bcrypt'); // Nhập thư viện bcrypt để mã hóa mật khẩu
+const bcrypt = require('bcryptjs'); // Nhập thư viện bcrypt để mã hóa mật khẩu
 
 class CustomerDAO {
     // Lấy tất cả khách hàng
