@@ -6,6 +6,9 @@ import { GiFlowerPot } from 'react-icons/gi';
 import '../styles/MenuComponent.css';
 import withRouter from '../utlis/withRouter';
 
+// Lấy URL API từ biến môi trường
+const API_URL = process.env.REACT_APP_API_URL || 'https://webnangcao-api.onrender.com/api';
+
 class Menu extends Component {
     constructor(props) {
         super(props);
@@ -48,7 +51,7 @@ class Menu extends Component {
 
     async fetchCategories() {
         try {
-            const response = await axios.get('/api/customer/categories');
+            const response = await axios.get(`${API_URL}/customer/categories`);
             if (response && response.data) {
                 this.setState({ categories: response.data });
             } else {
