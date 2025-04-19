@@ -1,9 +1,13 @@
 import React, { Component } from 'react';
 import axios from 'axios';
-import { FaUser, FaLock, FaEnvelope, FaPhone, FaArrowLeft, FaArrowRight, FaEye, FaEyeSlash } from 'react-icons/fa';
-import { Link } from 'react-router-dom';
+import { FaUser, FaLock, FaEnvelope, FaPhone, FaArrowLeft, FaArrowRight, FaEye, FaEyeSlash, FaExclamationTriangle, FaCheck } from 'react-icons/fa';
+import { Link, Navigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import '../styles/RegisterComponent.css';
+import MyContext from '../contexts/MyContext';
+
+// Lấy URL API từ biến môi trường
+const API_URL = process.env.REACT_APP_API_URL || 'https://webnangcao-api.onrender.com/api';
 
 // Hàm debounce để giới hạn số lần gọi API
 function debounce(func, wait) {
@@ -16,6 +20,8 @@ function debounce(func, wait) {
 }
 
 class Register extends Component {
+    static contextType = MyContext;
+
     constructor(props) {
         super(props);
         this.state = {
@@ -40,7 +46,9 @@ class Register extends Component {
                 txtPassword: '',
                 txtConfirmPassword: '',
                 txtEmail: ''
-            }
+            },
+            isRegistered: false,
+            isLoading: false
         };
         
         // Tạo debounced version của các hàm kiểm tra
@@ -220,7 +228,7 @@ class Register extends Component {
             });
             
             // Gọi API kiểm tra số điện thoại với timeout
-            const res = await axios.post('/api/customer/check-phone', { phone }, { timeout: 5000 });
+            const res = await axios.post(`${API_URL}/customer/check-phone`, { phone }, { timeout: 5000 });
             console.log('Kết quả kiểm tra số điện thoại:', res.data);
             
             // Nếu API không trả về success, coi như có lỗi
@@ -357,7 +365,7 @@ class Register extends Component {
         this.setState({ isProcessing: true, errorMessage: '' });
         
         try {
-            const res = await axios.post('/api/customer/register', account);
+            const res = await axios.post(`${API_URL}/customer/register`, account);
             const result = res.data;
             if (result.success === true) {
                 // Chỉ cuộn lên đầu khi đăng ký thành công
@@ -382,7 +390,8 @@ class Register extends Component {
                         txtPassword: '',
                         txtConfirmPassword: '',
                         txtEmail: ''
-                    }
+                    },
+                    isRegistered: true
                 });
             } else {
                 this.setState({
@@ -431,6 +440,16 @@ class Register extends Component {
     }
 
     render() {
+        // Nếu người dùng đã đăng nhập, điều hướng về trang chủ
+        if (this.context.token) {
+            return <Navigate replace to='/home' />;
+        }
+
+        // Nếu đã đăng ký thành công, điều hướng về trang đăng nhập
+        if (this.state.isRegistered) {
+            return <Navigate replace to='/login' />;
+        }
+
         const registerCardClass = `register-card ${this.state.mounted ? 'register-card-mounted' : ''}`;
         const { validationErrors } = this.state;
         

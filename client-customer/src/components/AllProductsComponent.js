@@ -7,6 +7,11 @@ import { toast } from 'react-toastify'; // Nhập thư viện toastify để hi�
 import '../styles/AllProductsComponent.css'; // Nhập file CSS cho component này
 import CartService from './services/CartService'; // Nhập dịch vụ giỏ hàng
 import MyContext from '../contexts/MyContext'; // Nhập context để quản lý trạng thái
+import { FaFilter, FaSortAmountDown, FaSearch, FaCaretDown, FaTimes, FaInfoCircle } from 'react-icons/fa';
+import LoadingSpinner from './LoadingSpinner';
+
+// Lấy URL API từ biến môi trường
+const API_URL = process.env.REACT_APP_API_URL || 'https://webnangcao-api.onrender.com/api';
 
 class AllProducts extends Component {
     static contextType = MyContext; // Xác định context mà component sẽ sử dụng
@@ -15,12 +20,21 @@ class AllProducts extends Component {
         super(props); // Gọi hàm khởi tạo của lớp cha
         this.state = {
             products: [], // Danh sách sản phẩm
+            filteredProducts: [],
             isLoading: true, // Trạng thái loading mặc định là true
             error: null, // Biến lưu trữ lỗi nếu có
             productType: null, // Loại sản phẩm (new, hot)
             title: "Tất Cả Sản Phẩm", // Tiêu đề mặc định
             currentPage: 1, // Trang hiện tại
-            productsPerPage: 10 // Số sản phẩm trên mỗi trang
+            productsPerPage: 10, // Số sản phẩm trên mỗi trang
+            categories: [],
+            selectedCategory: '',
+            price: {
+                min: '',
+                max: ''
+            },
+            sort: 'dateDesc',
+            showMobileFilter: false
         };
     }
 
@@ -29,8 +43,8 @@ class AllProducts extends Component {
 
         // Lấy loại sản phẩm từ URL query params
         const urlParams = new URLSearchParams(window.location.search);
-        const type = urlParams.get('type'); // Lấy loại sản phẩm từ tham số type
-        const all = urlParams.get('all'); // Lấy tham số all
+        const type = urlParams.get('type') || 'all'; // all, new, hot
+        const all = urlParams.get('all') === 'true'; // boolean indicator for all products
         const page = parseInt(urlParams.get('page')) || 1; // Lấy số trang từ tham số, mặc định là 1
         
         let title = "Tất Cả Sản Phẩm"; // Thiết lập tiêu đề mặc định
@@ -43,10 +57,11 @@ class AllProducts extends Component {
         this.setState({ 
             productType: type, // Cập nhật trạng thái loại sản phẩm
             title,
-            showAllProducts: all === 'true', // Kiểm tra xem có cần hiển thị tất cả sản phẩm không
+            showAllProducts: all, // Kiểm tra xem có cần hiển thị tất cả sản phẩm không
             currentPage: page // Cập nhật trang hiện tại
         }, () => {
-            this.loadProducts(); // Gọi hàm loadProducts để tải sản phẩm
+            this.fetchCategories();
+            this.fetchProducts(type, all);
         });
     }
 
@@ -58,7 +73,7 @@ class AllProducts extends Component {
 
         if (prevSearch !== currentSearch) { // Nếu search query đã thay đổi
             const urlParams = new URLSearchParams(currentSearch);
-            const type = urlParams.get('type'); // Lấy lại loại sản phẩm
+            const type = urlParams.get('type') || 'all'; // all, new, hot
             const page = parseInt(urlParams.get('page')) || 1; // Lấy lại số trang
 
             let title = "Tất Cả Sản Phẩm";
@@ -74,41 +89,58 @@ class AllProducts extends Component {
                 isLoading: true, // Đặt trạng thái loading thành true
                 currentPage: page // Cập nhật trang hiện tại
             }, () => {
-                this.loadProducts(); // Gọi hàm loadProducts để tải sản phẩm
+                this.fetchCategories();
+                this.fetchProducts(type, this.state.showAllProducts);
             });
         }
     }
 
-    loadProducts = async () => {
-        // Hàm tải sản phẩm từ API
+    fetchCategories = async () => {
         try {
-          this.setState({ isLoading: true }); // Đặt trạng thái loading
-          const { productType } = this.state; // Lấy loại sản phẩm từ state
-          let url = '/api/customer/products'; // URL mặc định để lấy sản phẩm
-          
-          // Thêm param all=true để lấy tất cả sản phẩm
-          if (productType === 'new') {
-            url = `/api/customer/products/new?all=true`; // URL cho sản phẩm mới
-          } else if (productType === 'hot') {
-            url = `/api/customer/products/hot?all=true`; // URL cho sản phẩm bán chạy
-          }
-      
-          const response = await axios.get(url); // Gửi yêu cầu GET để lấy dữ liệu
-          console.log(`Received ${response.data.length} products`); // In ra số lượng sản phẩm nhận được
-              
-          this.setState({
-            products: response.data || [], // Cập nhật danh sách sản phẩm
-            isLoading: false // Đặt trạng thái loading thành false
-          });
+            const response = await axios.get(`${API_URL}/customer/categories`);
+            this.setState({ categories: response.data || [] });
         } catch (error) {
-          console.error('Error fetching products:', error); // In lỗi ra console
-          this.setState({
-            error: 'Không thể tải sản phẩm. Vui lòng thử lại sau.', // Cập nhật thông điệp lỗi
-            isLoading: false  
-          });
-          toast.error('Lỗi khi tải sản phẩm'); // Hiển thị thông báo lỗi
+            console.error('Error fetching categories:', error);
         }
-      };
+    };
+
+    fetchProducts = async (type = 'all', all = false) => {
+        this.setState({ isLoading: true, error: null });
+        
+        let endpoint;
+        switch (type) {
+            case 'new':
+                endpoint = `${API_URL}/customer/products/new${all ? '?all=true' : ''}`;
+                break;
+            case 'hot':
+                endpoint = `${API_URL}/customer/products/hot${all ? '?all=true' : ''}`;
+                break;
+            default:
+                endpoint = `${API_URL}/customer/products`;
+                break;
+        }
+        
+        try {
+            const response = await axios.get(endpoint);
+            const products = response.data || [];
+            
+            this.setState({
+                products,
+                filteredProducts: products,
+                isLoading: false,
+                productType: type
+            }, () => {
+                this.applyFilters();
+            });
+        } catch (error) {
+            console.error('Error fetching products:', error);
+            this.setState({
+                error: 'Không thể tải danh sách sản phẩm',
+                isLoading: false
+            });
+            toast.error('Lỗi khi tải danh sách sản phẩm');
+        }
+    };
 
     handleAddToCart = async (product) => {
         // Hàm xử lý thêm sản phẩm vào giỏ hàng
@@ -183,6 +215,133 @@ class AllProducts extends Component {
         const totalPages = Math.ceil(products.length / this.state.productsPerPage); // Tính tổng số trang
         if (currentPage < totalPages) { // Nếu không phải trang cuối cùng
             this.handlePageChange(currentPage + 1); // Thay đổi sang trang tiếp theo
+        }
+    };
+
+    handleCategoryChange = (e) => {
+        this.setState({
+            selectedCategory: e.target.value
+        }, () => {
+            this.applyFilters();
+        });
+    };
+
+    handlePriceChange = (e) => {
+        const { name, value } = e.target;
+        this.setState(prevState => ({
+            price: {
+                ...prevState.price,
+                [name]: value
+            }
+        }));
+    };
+
+    handleSortChange = (e) => {
+        this.setState({
+            sort: e.target.value
+        }, () => {
+            this.applyFilters();
+        });
+    };
+
+    clearFilters = () => {
+        this.setState({
+            selectedCategory: '',
+            price: {
+                min: '',
+                max: ''
+            },
+            filteredProducts: this.state.products
+        });
+    };
+
+    applyFilters = () => {
+        const { products, selectedCategory, price, sort } = this.state;
+        
+        // Deep copy to avoid mutation
+        let filteredProducts = [...products];
+        
+        // Apply category filter
+        if (selectedCategory) {
+            filteredProducts = filteredProducts.filter(product => 
+                product.category && product.category._id === selectedCategory
+            );
+        }
+        
+        // Apply price filter
+        if (price.min && !isNaN(price.min)) {
+            filteredProducts = filteredProducts.filter(product => 
+                product.price >= parseFloat(price.min)
+            );
+        }
+        
+        if (price.max && !isNaN(price.max)) {
+            filteredProducts = filteredProducts.filter(product => 
+                product.price <= parseFloat(price.max)
+            );
+        }
+        
+        // Apply sorting
+        switch (sort) {
+            case 'priceAsc':
+                filteredProducts.sort((a, b) => a.price - b.price);
+                break;
+            case 'priceDesc':
+                filteredProducts.sort((a, b) => b.price - a.price);
+                break;
+            case 'nameAsc':
+                filteredProducts.sort((a, b) => a.name.localeCompare(b.name));
+                break;
+            case 'nameDesc':
+                filteredProducts.sort((a, b) => b.name.localeCompare(a.name));
+                break;
+            case 'dateDesc':
+                // Newest first (default)
+                filteredProducts.sort((a, b) => new Date(b.cdate) - new Date(a.cdate));
+                break;
+            case 'dateAsc':
+                // Oldest first
+                filteredProducts.sort((a, b) => new Date(a.cdate) - new Date(b.cdate));
+                break;
+            default:
+                break;
+        }
+        
+        this.setState({ filteredProducts });
+    };
+
+    handlePriceFilter = (e) => {
+        e.preventDefault();
+        this.applyFilters();
+    };
+
+    toggleMobileFilter = () => {
+        this.setState(prevState => ({
+            showMobileFilter: !prevState.showMobileFilter
+        }));
+    };
+
+    getPageTitle = () => {
+        const { productType } = this.state;
+        switch (productType) {
+            case 'new':
+                return 'Sản Phẩm Mới';
+            case 'hot':
+                return 'Sản Phẩm Bán Chạy';
+            default:
+                return 'Tất Cả Sản Phẩm';
+        }
+    };
+
+    getPageSubtitle = () => {
+        const { productType } = this.state;
+        switch (productType) {
+            case 'new':
+                return 'Những sản phẩm mới nhất tại cửa hàng của chúng tôi';
+            case 'hot':
+                return 'Những sản phẩm được khách hàng ưa chuộng nhất';
+            default:
+                return 'Khám phá tất cả sản phẩm tại Florista';
         }
     };
 
@@ -293,25 +452,25 @@ class AllProducts extends Component {
     }
 
     render() {
-        const { products, isLoading, error, title, currentPage, productsPerPage } = this.state;
+        const { filteredProducts, isLoading, error, title, currentPage, productsPerPage, categories, selectedCategory, price, sort, showMobileFilter } = this.state;
         const { token } = this.context;
         const isLoggedIn = !!token;
 
         if (isLoading) {
-            return (
-                <div className="loading-spinner-container">
-                    <div className="loading-spinner"></div>
-                    <p>Đang tải dữ liệu...</p>
-                </div>
-            );
+            return <LoadingSpinner />;
         }
 
         if (error) {
             return (
                 <div className="error-container">
-                    <h3>Đã xảy ra lỗi</h3>
-                    <p>{error}</p>
-                    <button onClick={this.loadProducts}>Thử lại</button>
+                    <FaInfoCircle className="error-icon" />
+                    <p className="error-message">{error}</p>
+                    <button 
+                        className="retry-button"
+                        onClick={() => this.fetchProducts()}
+                    >
+                        Thử lại
+                    </button>
                 </div>
             );
         }
@@ -319,32 +478,160 @@ class AllProducts extends Component {
         // Get current products for pagination
         const indexOfLastProduct = currentPage * productsPerPage;
         const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
-        const currentProducts = products.slice(indexOfFirstProduct, indexOfLastProduct);
+        const currentProducts = filteredProducts.slice(indexOfFirstProduct, indexOfLastProduct);
 
         return (
-            <div className="category-products-container">
+            <div className="all-products-container">
                 <div className="container">
                     <div className="section-header">
-                        <h2 className="section-title">{title}</h2>
+                        <h2 className="section-title">{this.getPageTitle()}</h2>
                         
                         <div className="section-divider">
                             <span className="divider-leaf"><FaLeaf /></span>
                         </div>
                         
-                        <p className="section-subtitle">
-                            Có {products.length} sản phẩm
-                        </p>
+                        <p className="section-subtitle">{this.getPageSubtitle()}</p>
                     </div>
 
-                    <div className="products-wrapper">
-                        <ProductComponent
-                            products={currentProducts}
-                            emptyMessage="Không có sản phẩm nào để hiển thị."
-                            onAddToCart={this.handleAddToCart}
-                            onAddToWishlist={this.handleAddToWishlist}
-                            isLoggedIn={isLoggedIn}
-                            token={token}
-                        />
+                    <div className="products-content">
+                        {/* Mobile Filter Toggle */}
+                        <button 
+                            className="mobile-filter-toggle"
+                            onClick={this.toggleMobileFilter}
+                        >
+                            <FaFilter /> Bộ lọc sản phẩm <FaCaretDown />
+                        </button>
+                        
+                        {/* Filters Sidebar */}
+                        <div className={`products-sidebar ${showMobileFilter ? 'show-mobile-filter' : ''}`}>
+                            <div className="sidebar-header">
+                                <h3>Bộ lọc sản phẩm</h3>
+                                <button 
+                                    className="mobile-close-filter"
+                                    onClick={this.toggleMobileFilter}
+                                >
+                                    <FaTimes />
+                                </button>
+                            </div>
+                            
+                            <div className="filter-section">
+                                <h4 className="filter-title">
+                                    <FaFilter className="filter-icon" /> Danh mục
+                                </h4>
+                                <select 
+                                    value={selectedCategory}
+                                    onChange={this.handleCategoryChange}
+                                    className="category-select"
+                                >
+                                    <option value="">Tất cả danh mục</option>
+                                    {categories.map(category => (
+                                        <option key={category._id} value={category._id}>
+                                            {category.name}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+                            
+                            <div className="filter-section">
+                                <h4 className="filter-title">
+                                    <FaFilter className="filter-icon" /> Giá
+                                </h4>
+                                <form onSubmit={this.handlePriceFilter} className="price-filter-form">
+                                    <div className="price-inputs">
+                                        <input
+                                            type="number"
+                                            name="min"
+                                            placeholder="Giá từ"
+                                            value={price.min}
+                                            onChange={this.handlePriceChange}
+                                            className="price-input"
+                                            min="0"
+                                        />
+                                        <span className="price-separator">-</span>
+                                        <input
+                                            type="number"
+                                            name="max"
+                                            placeholder="Giá đến"
+                                            value={price.max}
+                                            onChange={this.handlePriceChange}
+                                            className="price-input"
+                                            min={price.min || 0}
+                                        />
+                                    </div>
+                                    <button type="submit" className="apply-price-btn">
+                                        <FaSearch /> Áp dụng
+                                    </button>
+                                </form>
+                            </div>
+                            
+                            <div className="filter-section">
+                                <h4 className="filter-title">
+                                    <FaSortAmountDown className="filter-icon" /> Sắp xếp
+                                </h4>
+                                <select 
+                                    value={sort}
+                                    onChange={this.handleSortChange}
+                                    className="sort-select"
+                                >
+                                    <option value="dateDesc">Mới nhất</option>
+                                    <option value="dateAsc">Cũ nhất</option>
+                                    <option value="priceAsc">Giá tăng dần</option>
+                                    <option value="priceDesc">Giá giảm dần</option>
+                                    <option value="nameAsc">Tên A-Z</option>
+                                    <option value="nameDesc">Tên Z-A</option>
+                                </select>
+                            </div>
+                            
+                            <button 
+                                className="clear-filters-btn"
+                                onClick={this.clearFilters}
+                            >
+                                <FaTimes /> Xóa bộ lọc
+                            </button>
+                        </div>
+                        
+                        {/* Products Grid */}
+                        <div className="products-grid-container">
+                            <div className="filter-status">
+                                <p>
+                                    Đang hiển thị <strong>{filteredProducts.length}</strong> sản phẩm
+                                    {selectedCategory && (
+                                        <> trong danh mục <strong>
+                                            {categories.find(c => c._id === selectedCategory)?.name || 'N/A'}
+                                        </strong></>
+                                    )}
+                                    {(price.min || price.max) && (
+                                        <> với giá{' '}
+                                            {price.min && <strong>từ {Number(price.min).toLocaleString('vi-VN')}₫</strong>}
+                                            {price.min && price.max && <> đến </>}
+                                            {price.max && <strong>{Number(price.max).toLocaleString('vi-VN')}₫</strong>}
+                                        </>
+                                    )}
+                                </p>
+                            </div>
+                            
+                            {filteredProducts.length === 0 ? (
+                                <div className="no-products-found">
+                                    <FaInfoCircle className="no-products-icon" />
+                                    <p>Không tìm thấy sản phẩm nào phù hợp với bộ lọc</p>
+                                    <button 
+                                        className="clear-filters-btn"
+                                        onClick={this.clearFilters}
+                                    >
+                                        Xóa bộ lọc
+                                    </button>
+                                </div>
+                            ) : (
+                                <ProductComponent
+                                    products={currentProducts}
+                                    emptyMessage="Không có sản phẩm nào để hiển thị."
+                                    onAddToCart={this.handleAddToCart}
+                                    onAddToWishlist={this.handleAddToWishlist}
+                                    isLoggedIn={isLoggedIn}
+                                    token={token}
+                                />
+                            )}
+                        </div>
                     </div>
 
                     {this.renderPagination()}

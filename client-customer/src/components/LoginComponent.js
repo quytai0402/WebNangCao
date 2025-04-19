@@ -2,11 +2,14 @@ import React, { Component } from 'react';
 import { Navigate } from 'react-router-dom';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
-import { FaUser, FaLock, FaArrowRight } from 'react-icons/fa';
+import { FaUser, FaLock, FaArrowRight, FaEye, FaEyeSlash } from 'react-icons/fa';
 import { GiFlowerPot } from 'react-icons/gi';
 import MyContext from '../contexts/MyContext';
 import '../styles/LoginComponent.css';
 import { toast } from 'react-toastify';
+
+// Lấy URL API từ biến môi trường
+const API_URL = process.env.REACT_APP_API_URL || 'https://webnangcao-api.onrender.com/api';
 
 class Login extends Component {
   static contextType = MyContext;
@@ -19,7 +22,10 @@ class Login extends Component {
       redirect: false,
       errorMessage: '',
       isProcessing: false,
-      mounted: false
+      mounted: false,
+      showPassword: false,
+      isLoading: false,
+      redirectToHome: false
     };
   }
 
@@ -160,6 +166,10 @@ class Login extends Component {
       return <Navigate to="/" />;
     }
 
+    if (this.state.redirectToHome) {
+      return <Navigate replace to="/" />;
+    }
+
     const loginCardClass = `login-card ${this.state.mounted ? 'login-card-mounted' : ''}`;
 
     return (
@@ -182,7 +192,7 @@ class Login extends Component {
               </div>
             )}
 
-            <form onSubmit={this.btnLoginClick} className="login-form">
+            <form onSubmit={this.handleSubmit} className="login-form">
               <div className="login-form-group">
                 <label htmlFor="username" className="login-label">
                   Tên Đăng Nhập
@@ -200,6 +210,7 @@ class Login extends Component {
                     value={this.state.txtUsername}
                     onChange={this.handleInputChange}
                     autoComplete="username"
+                    disabled={this.state.isLoading}
                   />
                 </div>
               </div>
@@ -212,16 +223,27 @@ class Login extends Component {
                   <span className="login-input-icon">
                     <FaLock />
                   </span>
-                  <input
-                    type="password"
-                    id="password"
-                    name="txtPassword"
-                    placeholder="Nhập mật khẩu"
-                    className="login-input"
-                    value={this.state.txtPassword}
-                    onChange={this.handleInputChange}
-                    autoComplete="current-password"
-                  />
+                  <div className="password-input-container">
+                    <input
+                      type={this.state.showPassword ? "text" : "password"}
+                      id="password"
+                      name="txtPassword"
+                      placeholder="Nhập mật khẩu"
+                      className="login-input"
+                      value={this.state.txtPassword}
+                      onChange={this.handleInputChange}
+                      autoComplete="current-password"
+                      disabled={this.state.isLoading}
+                    />
+                    <button
+                      type="button"
+                      className="password-toggle"
+                      onClick={this.togglePasswordVisibility}
+                      tabIndex="-1"
+                    >
+                      {this.state.showPassword ? <FaEyeSlash /> : <FaEye />}
+                    </button>
+                  </div>
                 </div>
               </div>
 
@@ -266,6 +288,92 @@ class Login extends Component {
         </div>
       </div>
     );
+  }
+
+  handleInputChange = (e) => {
+    const { name, value } = e.target;
+    this.setState({ 
+      [name]: value,
+      errorMessage: '' // Clear error when user types
+    });
+  }
+
+  togglePasswordVisibility = () => {
+    this.setState(prevState => ({
+      showPassword: !prevState.showPassword
+    }));
+  }
+
+  handleSubmit = async (e) => {
+    e.preventDefault();
+    
+    // Set loading state
+    this.setState({ isLoading: true, errorMessage: '' });
+
+    const username = this.state.txtUsername.trim();
+    const password = this.state.txtPassword;
+
+    if (!username || !password) {
+      this.setState({ 
+        errorMessage: 'Vui lòng nhập đầy đủ thông tin đăng nhập',
+        isLoading: false
+      });
+      return;
+    }
+
+    try {
+      const response = await axios.post(`${API_URL}/customer/login`, {
+        username: username,
+        password: password
+      });
+      
+      const result = response.data;
+      
+      if (result.success) {
+        // Store token in context
+        this.context.setToken(result.token);
+        this.context.setCustomer(result.customer);
+        
+        // Save to localStorage
+        localStorage.setItem('token', result.token);
+        localStorage.setItem('customer', JSON.stringify(result.customer));
+        
+        // Show success message
+        toast.success('Đăng nhập thành công!', {
+          position: "top-center",
+          autoClose: 1500,
+        });
+        
+        // Redirect to home page
+        setTimeout(() => {
+          this.setState({ redirectToHome: true });
+        }, 1500);
+      } else {
+        this.setState({ 
+          errorMessage: result.message || 'Đăng nhập thất bại',
+          isLoading: false
+        });
+      }
+    } catch (error) {
+      console.error('Login error:', error);
+      
+      let errorMsg = 'Đã có lỗi xảy ra. Vui lòng thử lại sau.';
+      
+      if (error.response) {
+        if (error.response.status === 401) {
+          errorMsg = 'Tên đăng nhập hoặc mật khẩu không chính xác';
+        } else if (error.response.data && error.response.data.message) {
+          errorMsg = error.response.data.message;
+        }
+      } else if (error.request) {
+        errorMsg = 'Không thể kết nối đến máy chủ. Vui lòng kiểm tra kết nối của bạn.';
+      }
+      
+      this.setState({ 
+        errorMessage: errorMsg,
+        isLoading: false
+      });
+    }
   }
 }
 

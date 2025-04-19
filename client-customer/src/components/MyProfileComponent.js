@@ -5,11 +5,14 @@ import {
   FaUser, FaEnvelope, FaPhone, FaMapMarkerAlt, FaEdit,
   FaKey, FaEye, FaEyeSlash, FaArrowLeft, FaCheck,
   FaTimes, FaExclamationTriangle, FaShoppingBag, FaMoneyBillWave,
-  FaListAlt
+  FaListAlt, FaLock, FaSignOutAlt, FaInfoCircle
 } from 'react-icons/fa';
 import MyContext from '../contexts/MyContext';
 import '../styles/MyProfileComponent.css';
 import { toast } from 'react-toastify';
+
+// Lấy URL API từ biến môi trường
+const API_URL = process.env.REACT_APP_API_URL || 'https://webnangcao-api.onrender.com/api';
 
 class MyProfile extends Component {
   static contextType = MyContext;
@@ -41,10 +44,24 @@ class MyProfile extends Component {
         totalSpent: 0,
         lastOrder: null
       },
-      loadingStats: false
+      loadingStats: false,
+      display: 'profile', // 'profile' hoặc 'password'
+      txtUsername: '',
+      txtPassword: '',
+      txtName: '',
+      txtPhone: '',
+      txtEmail: '',
+      txtAddress: '',
+      txtCurrentPassword: '',
+      txtNewPassword: '',
+      txtConfirmPassword: '',
+      loading: true,
+      isLoggedIn: false,
+      errors: {}
     };
     this.formRef = React.createRef();
   }
+
   loadOrderStats = async () => {
     try {
       this.setState({ loadingStats: true });
@@ -54,7 +71,7 @@ class MyProfile extends Component {
         throw new Error('Unauthorized access');
       }
   
-      const response = await axios.get(`/api/customer/orders/${this.context.customer._id}`, {
+      const response = await axios.get(`${API_URL}/customer/orders/${this.context.customer._id}`, {
         headers: { 'x-access-token': this.context.token }
       });
   
@@ -114,15 +131,17 @@ class MyProfile extends Component {
 
     // Sửa lại từ fetchOrderStats thành loadOrderStats
     this.loadOrderStats();
+
+    if (this.context && this.context.token) {
+      this.fetchProfile();
+    } else {
+      this.setState({ loading: false, isLoggedIn: false });
+    }
   }
-
-
 
   componentWillUnmount() {
     // Clean up any pending tasks or listeners here if necessary
   }
-
-  
 
   setActiveTab = (tab) => {
     this.setState({
@@ -270,7 +289,7 @@ class MyProfile extends Component {
   
     try {
       const response = await axios.put(
-        '/api/customer/update-profile',
+        `${API_URL}/customer/update-profile`,
         { name, phone, email, address },
         { headers: { 'x-access-token': this.context.token } }
       );
@@ -325,7 +344,7 @@ class MyProfile extends Component {
 
     try {
       const response = await axios.put(
-        '/api/customer/change-password',
+        `${API_URL}/customer/change-password`,
         { currentPassword, newPassword },
         { headers: { 'x-access-token': this.context.token } }
       );
@@ -352,6 +371,101 @@ class MyProfile extends Component {
       toast.error(errorMsg);
     } finally {
       this.setState({ passwordLoading: false });
+    }
+  };
+
+  fetchProfile = async () => {
+    try {
+      const response = await axios.get(`${API_URL}/customer/profile`, {
+        headers: { 'x-access-token': this.context.token }
+      });
+      const customer = response.data;
+      if (customer) {
+        this.setState({
+          txtUsername: customer.username || '',
+          txtName: customer.name || '',
+          txtPhone: customer.phone || '',
+          txtEmail: customer.email || '',
+          txtAddress: customer.address || '',
+          loading: false,
+          isLoggedIn: true
+        });
+      }
+    } catch (error) {
+      toast.error('Không thể tải thông tin hồ sơ');
+      console.error(error);
+      this.setState({ loading: false, isLoggedIn: false });
+    }
+  };
+
+  updateProfile = async (e) => {
+    e.preventDefault();
+
+    // Validate form
+    const errors = this.validateProfileForm();
+    if (Object.keys(errors).length > 0) {
+      this.setState({ errors });
+      return;
+    }
+
+    const { txtName, txtPhone, txtEmail, txtAddress } = this.state;
+    const customer = {
+      name: txtName,
+      phone: txtPhone,
+      email: txtEmail,
+      address: txtAddress
+    };
+
+    try {
+      const response = await axios.put(`${API_URL}/customer/profile`, customer, {
+        headers: { 'x-access-token': this.context.token }
+      });
+      if (response.data) {
+        toast.success('Cập nhật hồ sơ thành công', {
+          position: "top-center",
+          autoClose: 2000
+        });
+        this.setState({ errors: {} });
+      } else {
+        toast.error('Cập nhật hồ sơ thất bại');
+      }
+    } catch (error) {
+      console.error(error);
+      if (error.response && error.response.data) {
+        toast.error(error.response.data.message || 'Cập nhật hồ sơ thất bại');
+      } else {
+        toast.error('Cập nhật hồ sơ thất bại');
+      }
+    }
+  };
+
+  validateProfileForm = () => {
+    const errors = {};
+    const { txtName, txtPhone, txtEmail } = this.state;
+
+    if (!txtName.trim()) {
+      errors.name = 'Họ và tên không được để trống';
+    }
+
+    if (!txtPhone.trim()) {
+      errors.phone = 'Số điện thoại không được để trống';
+    } else if (!/^[0-9]{10,11}$/.test(txtPhone.trim())) {
+      errors.phone = 'Số điện thoại không hợp lệ';
+    }
+
+    if (!txtEmail.trim()) {
+      errors.email = 'Email không được để trống';
+    } else if (!/\S+@\S+\.\S+/.test(txtEmail.trim())) {
+      errors.email = 'Email không hợp lệ';
+    }
+
+    return errors;
+  };
+
+  handleLogout = () => {
+    if (window.confirm('Bạn có chắc chắn muốn đăng xuất?')) {
+      this.context.setToken('');
+      window.location.href = '/login';
     }
   };
 
@@ -490,7 +604,7 @@ class MyProfile extends Component {
           </div>
         )}
 
-        <form onSubmit={this.saveProfile} ref={this.formRef}>
+        <form onSubmit={this.updateProfile} ref={this.formRef}>
           <div className="profile-info">
             <div className="info-group">
               <div className="info-label">
@@ -501,14 +615,14 @@ class MyProfile extends Component {
                 {editMode ? (
                   <input
                     type="text"
-                    name="name"
-                    value={name}
+                    name="txtName"
+                    value={this.state.txtName}
                     onChange={this.handleInputChange}
                     className="profile-input"
                     placeholder="Nhập họ và tên"
                   />
                 ) : (
-                  <span>{name || 'Chưa cập nhật'}</span>
+                  <span>{this.state.txtName || 'Chưa cập nhật'}</span>
                 )}
               </div>
             </div>
@@ -522,14 +636,14 @@ class MyProfile extends Component {
                 {editMode ? (
                   <input
                     type="tel"
-                    name="phone"
-                    value={phone}
+                    name="txtPhone"
+                    value={this.state.txtPhone}
                     onChange={this.handleInputChange}
                     className="profile-input"
                     placeholder="Nhập số điện thoại"
                   />
                 ) : (
-                  <span>{phone || 'Chưa cập nhật'}</span>
+                  <span>{this.state.txtPhone || 'Chưa cập nhật'}</span>
                 )}
               </div>
             </div>
@@ -543,14 +657,14 @@ class MyProfile extends Component {
                 {editMode ? (
                   <input
                     type="email"
-                    name="email"
-                    value={email}
+                    name="txtEmail"
+                    value={this.state.txtEmail}
                     onChange={this.handleInputChange}
                     className="profile-input"
                     placeholder="Nhập email"
                   />
                 ) : (
-                  <span>{email || 'Chưa cập nhật'}</span>
+                  <span>{this.state.txtEmail || 'Chưa cập nhật'}</span>
                 )}
               </div>
             </div>
@@ -563,15 +677,15 @@ class MyProfile extends Component {
               <div className="info-value">
                 {editMode ? (
                   <textarea
-                    name="address"
-                    value={address}
+                    name="txtAddress"
+                    value={this.state.txtAddress}
                     onChange={this.handleInputChange}
                     className="profile-textarea"
                     placeholder="Nhập địa chỉ"
                     rows={3}
                   ></textarea>
                 ) : (
-                  <span>{address || 'Chưa cập nhật'}</span>
+                  <span>{this.state.txtAddress || 'Chưa cập nhật'}</span>
                 )}
               </div>
             </div>
@@ -646,8 +760,8 @@ class MyProfile extends Component {
                 <input
                   type={showCurrentPassword ? "text" : "password"}
                   id="currentPassword"
-                  name="currentPassword"
-                  value={currentPassword}
+                  name="txtCurrentPassword"
+                  value={this.state.txtCurrentPassword}
                   onChange={this.handlePasswordChange}
                   className="password-input"
                   placeholder="Nhập mật khẩu hiện tại"
@@ -668,8 +782,8 @@ class MyProfile extends Component {
                 <input
                   type={showNewPassword ? "text" : "password"}
                   id="newPassword"
-                  name="newPassword"
-                  value={newPassword}
+                  name="txtNewPassword"
+                  value={this.state.txtNewPassword}
                   onChange={this.handlePasswordChange}
                   className="password-input"
                   placeholder="Nhập mật khẩu mới"
@@ -691,8 +805,8 @@ class MyProfile extends Component {
                 <input
                   type={showConfirmPassword ? "text" : "password"}
                   id="confirmPassword"
-                  name="confirmPassword"
-                  value={confirmPassword}
+                  name="txtConfirmPassword"
+                  value={this.state.txtConfirmPassword}
                   onChange={this.handlePasswordChange}
                   className="password-input"
                   placeholder="Nhập lại mật khẩu mới"
@@ -723,44 +837,58 @@ class MyProfile extends Component {
   }
 
   render() {
-    if (!this.context.token) {
+    const { display, loading, isLoggedIn } = this.state;
+
+    if (loading) {
+      return (
+        <div className="spinner-container">
+          <div className="spinner-border text-primary" role="status">
+            <span className="visually-hidden">Đang tải...</span>
+          </div>
+        </div>
+      );
+    }
+
+    if (!isLoggedIn) {
       return <Navigate to="/login" />;
     }
 
-    const { activeTab, mounted } = this.state;
-
-    const profileCardClass = `profile-card ${mounted ? 'profile-card-mounted' : ''}`;
-
     return (
       <div className="profile-container">
-        <div className={profileCardClass}>
+        <div className="profile-card">
+          <div className="profile-header">
+            <h2>Quản lý tài khoản</h2>
+          </div>
+          
           <div className="profile-tabs">
-            <div
-              className={`profile-tab ${activeTab === 'info' ? 'active' : ''}`}
-              onClick={() => this.setActiveTab('info')}
+            <button 
+              className={`tab-button ${display === 'profile' ? 'active' : ''}`}
+              onClick={() => this.setState({ display: 'profile', errors: {} })}
             >
               <FaUser className="tab-icon" />
-              <span className="tab-text">Thông tin cá nhân</span>
-            </div>
-            <div
-              className={`profile-tab ${activeTab === 'password' ? 'active' : ''}`}
-              onClick={() => this.setActiveTab('password')}
+              Thông tin cá nhân
+            </button>
+            <button 
+              className={`tab-button ${display === 'password' ? 'active' : ''}`}
+              onClick={() => this.setState({ display: 'password', errors: {} })}
             >
-              <FaKey className="tab-icon" />
-              <span className="tab-text">Đổi mật khẩu</span>
-            </div>
+              <FaLock className="tab-icon" />
+              Đổi mật khẩu
+            </button>
+            <button 
+              className="tab-button logout"
+              onClick={this.handleLogout}
+            >
+              <FaSignOutAlt className="tab-icon" />
+              Đăng xuất
+            </button>
           </div>
-
+          
           <div className="profile-content">
-            {activeTab === 'info' ? this.renderInfoTab() : this.renderPasswordTab()}
+            {display === 'profile' && this.renderInfoTab()}
+            
+            {display === 'password' && this.renderPasswordTab()}
           </div>
-        </div>
-
-        <div className="profile-decorations">
-          <div className="profile-decoration profile-decoration-1"></div>
-          <div className="profile-decoration profile-decoration-2"></div>
-          <div className="profile-decoration profile-decoration-3"></div>
-          <div className="profile-decoration profile-decoration-4"></div>
         </div>
       </div>
     );
