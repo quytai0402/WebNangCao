@@ -4,8 +4,11 @@ import { Navigate } from 'react-router-dom'; // Nhập component Navigate từ r
 import { toast } from 'react-toastify'; // Nhập thư viện toastify để hiển thị thông báo
 import '../styles/ActiveComponent.css'; // Nhập file CSS cho component này
 import { FaCheckCircle, FaTimesCircle } from 'react-icons/fa'; // Nhập biểu tượng từ react-icons
+import MyContext from '../contexts/MyContext'; // Nhập MyContext
 
 class Active extends Component {
+  static contextType = MyContext; // Thiết lập contextType
+
   constructor(props) {
     super(props); // Gọi hàm khởi tạo của lớp cha
     this.state = {
