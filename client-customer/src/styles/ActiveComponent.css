@@ -1,0 +1,80 @@
+.activate-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #ff758c 0%, #ff7eb3 100%);
+    padding: 20px;
+  }
+  
+  .activate-card {
+    width: 100%;
+    max-width: 500px;
+    background-color: #fff;
+    border-radius: 20px;
+    padding: 40px;
+    box-shadow: 0 10px 30px rgba(255, 117, 140, 0.3);
+    text-align: center;
+  }
+  
+  .activate-card h2 {
+    color: #ff758c;
+    margin-bottom: 30px;
+    font-size: 28px;
+    font-weight: 700;
+  }
+  
+  .loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .spinner {
+    width: 50px;
+    height: 50px;
+    border: 5px solid rgba(255, 117, 140, 0.1);
+    border-radius: 50%;
+    border-top-color: #ff758c;
+    animation: spin 1s ease-in-out infinite;
+    margin-bottom: 20px;
+  }
+  
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+  
+  .success-message, .error-message {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+  }
+  
+  .success-icon {
+    color: #4CAF50;
+    margin-bottom: 20px;
+  }
+  
+  .error-icon {
+    color: #F44336;
+    margin-bottom: 20px;
+  }
+  
+  .redirect-button {
+    margin-top: 20px;
+    padding: 12px 25px;
+    background: linear-gradient(135deg, #ff758c 0%, #ff7eb3 100%);
+    color: white;
+    border: none;
+    border-radius: 30px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  
+  .redirect-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(255, 117, 140, 0.3);
+  }

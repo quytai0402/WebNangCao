@@ -1,0 +1,816 @@
+
+
+
+/* Floral Theme Variables */
+:root {
+    --primary-color: #ff7eb3;
+    --primary-dark: #e7527b;
+    --primary-light: #ffc0d6;
+    --accent-color: #6cbf69;
+    --accent-dark: #4a9b4a;
+    --text-color: #2c3e50;
+    --text-light: #5d6d7e;
+    --text-lighter: #95a5a6;
+    --white: #ffffff;
+    --off-white: #f9f9f9;
+    --light-bg: #f5f7fa;
+    --border-color: #eaeaea;
+    --shadow-sm: 0 2px 8px rgba(231, 84, 128, 0.08);
+    --shadow-md: 0 6px 16px rgba(231, 84, 128, 0.1);
+    --shadow-lg: 0 12px 28px rgba(231, 84, 128, 0.12);
+    --radius-sm: 6px;
+    --radius-md: 12px;
+    --radius-lg: 16px;
+    --radius-xl: 24px;
+    --header-height: 80px;
+    --transition-base: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  /* Base Styles */
+  .top-info-bar {
+    font-family: 'Poppins', 'Arial', sans-serif;
+    color: var(--text-color);
+    line-height: 1.6;
+  }
+  
+  .container {
+    max-width: 1200px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+
+  
+  /* Banner Strip - Floral Pattern Background */
+  .banner-strip {
+    background: linear-gradient(145deg, #fff3f7 0%, #f8f1ff 100%);
+    padding: 4px 0; /* Giảm padding từ 8px xuống 4px */
+    position: relative;
+    overflow: hidden;
+    border-bottom: 1px solid rgba(231, 84, 128, 0.1);
+}
+
+  
+  .banner-strip::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ff80ab' fill-opacity='0.05'%3E%3Cpath d='M50,50 C55.5228475,50 60,45.5228475 60,40 C60,34.4771525 55.5228475,30 50,30 C44.4771525,30 40,34.4771525 40,40 C40,45.5228475 44.4771525,50 50,50 Z M30,50 C35.5228475,50 40,45.5228475 40,40 C40,34.4771525 35.5228475,30 30,30 C24.4771525,30 20,34.4771525 20,40 C20,45.5228475 24.4771525,50 30,50 Z M50,30 C55.5228475,30 60,25.5228475 60,20 C60,14.4771525 55.5228475,10 50,10 C44.4771525,10 40,14.4771525 40,20 C40,25.5228475 44.4771525,30 50,30 Z M30,30 C35.5228475,30 40,25.5228475 40,20 C40,14.4771525 35.5228475,10 30,10 C24.4771525,10 20,14.4771525 20,20 C20,25.5228475 24.4771525,30 30,30 Z'%3E%3C/path%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    opacity: 0.35;
+  }
+  
+  .banner-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2px 15px; /* Giảm padding từ 4px xuống 2px */
+    font-size: 13px; /* Giảm font-size từ 14px xuống 13px */
+}
+
+
+
+
+.contact-info {
+  display: flex;
+  gap: 10px; /* Giảm gap từ 12px xuống 10px */
+  align-items: center;
+}
+
+
+.contact-item {
+    display: flex;
+    align-items: center;
+    gap: 6px; /* Giảm gap */
+    color: var(--text-light);
+}
+
+.contact-icon {
+    font-size: 14px; /* Giảm kích thước icon */
+    color: var(--primary-color);
+}
+  
+  /* Shop Announcement with Floral Accent */
+  .shop-announcement {
+    font-size: 15px;
+    color: var(--primary-dark);
+    font-weight: 500;
+    text-align: center;
+    padding: 0 10px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  
+  .flower-accent {
+    color: var(--primary-color);
+    font-size: 16px;
+    animation: flowerspin 8s linear infinite;
+  }
+  
+  @keyframes flowerspin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+  
+  .announcement-text {
+    position: relative;
+    padding: 0 10px;
+  }
+  
+  /* Main Header */
+  .info-bar-wrapper {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0; /* Giảm padding từ 20px xuống 10px */
+    transition: padding 0.3s ease;
+    max-width: 1200px; /* Thêm max-width để giới hạn độ rộng */
+    margin: 0 auto; /* Căn giữa wrapper */
+}
+
+  
+  /* Logo and Branding with Flower Iconography */
+  .welcome-message {
+    display: flex;
+    align-items: center;
+    gap: 10px; /* Giảm gap từ 15px xuống 10px */
+}
+
+  
+.logo-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 6px; /* Giảm gap từ 8px xuống 6px */
+}
+  
+  .flower-icon {
+    font-size: 28px;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+  }
+  
+  .flower-icon.primary {
+    color: var(--primary-color);
+  }
+  
+  .flower-icon.secondary {
+    color: var(--primary-dark);
+    font-size: 22px;
+    position: relative;
+    top: -5px;
+  }
+  
+  .brand-name {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--primary-dark);
+    letter-spacing: 0.5px;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    font-family: 'Playfair Display', serif;
+  }
+  
+  .welcome-text {
+    padding-left: 15px;
+    margin-left: 12px;
+    border-left: 1px solid var(--border-color);
+    font-size: 13px;
+    color: var(--text-light);
+    font-style: italic;
+  }
+  
+  /* User Actions */
+  .user-actions {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+  
+  /* Auth Links with Floral Hover Effect */
+  .auth-links {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  
+  .top-link {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--text-color);
+    text-decoration: none;
+    font-size: 14px;
+    transition: var(--transition-base);
+    font-weight: 500;
+    padding: 8px 12px;
+    border-radius: var(--radius-md);
+  }
+  
+  .top-link .icon {
+    color: var(--primary-color);
+    font-size: 16px;
+  }
+  
+  .top-link:hover {
+    color: var(--primary-color);
+    background-color: rgba(231, 84, 128, 0.08);
+    transform: translateY(-2px);
+  }
+  
+  .login-link, .register-link {
+    transition: var(--transition-base);
+  }
+  
+  .login-link:hover, .register-link:hover {
+    background-color: rgba(231, 84, 128, 0.08);
+  }
+  
+  .separator {
+    color: var(--border-color);
+  }
+  
+  /* User Dropdown with Floral Avatar */
+  .user-dropdown {
+    position: relative;
+    z-index: 1000;
+  }
+  
+  .user-dropdown-trigger {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 16px;
+    background: none;
+    border: 2px solid var(--border-color);
+    cursor: pointer;
+    font-size: 14px;
+    color: var(--text-color);
+    transition: var(--transition-base);
+    border-radius: 30px;
+  }
+  
+  .user-dropdown-trigger:hover {
+    background-color: rgba(231, 84, 128, 0.08);
+    border-color: var(--primary-light);
+    color: var(--primary-dark);
+    transform: translateY(-2px);
+  }
+  
+  .user-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-light) 100%);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 14px;
+    box-shadow: 0 3px 8px rgba(231, 84, 128, 0.25);
+  }
+  
+  .user-name {
+    font-weight: 500;
+  }
+  
+  .dropdown-icon {
+    transition: transform 0.3s ease;
+    font-size: 12px;
+    color: var(--text-lighter);
+  }
+  
+  .dropdown-icon.open {
+    transform: rotate(180deg);
+    color: var(--primary-color);
+  }
+  
+  /* Dropdown Menu with Enhanced Styling */
+  /* Dropdown Menu with Enhanced Styling */
+.dropdown-menu {
+  position: absolute;
+  top: calc(100% + 15px);
+  right: 0;
+  min-width: 280px;
+  background: var(--white);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-8px) scale(0.98);
+  transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+  /* Tăng z-index của dropdown lên cao hơn navigation */
+  z-index: 1000;
+  overflow: hidden;
+  border: 1px solid rgba(231, 84, 128, 0.1);
+}
+  
+  .dropdown-menu.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0) scale(1);
+  }
+  
+  .dropdown-menu::before {
+    content: '';
+    position: absolute;
+    top: -8px;
+    right: 30px;
+    width: 16px;
+    height: 16px;
+    background: white;
+    border-top: 1px solid rgba(231, 84, 128, 0.1);
+    border-left: 1px solid rgba(231, 84, 128, 0.1);
+    transform: rotate(45deg);
+    z-index: 0;
+  }
+  
+  .dropdown-header {
+    padding: 18px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    background: linear-gradient(to right, rgba(255, 126, 179, 0.05), rgba(255, 192, 214, 0.08));
+    border-bottom: 1px solid rgba(231, 84, 128, 0.1);
+    position: relative;
+    z-index: 1;
+  }
+  
+  .user-avatar-large {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-light) 100%);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 20px;
+    box-shadow: 0 4px 10px rgba(231, 84, 128, 0.2);
+  }
+  
+  .dropdown-user-info {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .dropdown-user-name {
+    font-weight: 600;
+    color: var(--text-color);
+    font-size: 15px;
+  }
+  
+  .dropdown-user-email {
+    font-size: 12px;
+    color: var(--text-light);
+  }
+  
+  .dropdown-divider {
+    height: 1px;
+    background-color: rgba(231, 84, 128, 0.08);
+    margin: 4px 0;
+  }
+  
+  .dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 18px;
+    color: var(--text-color);
+    text-decoration: none;
+    width: 100%;
+    border: none;
+    background: none;
+    cursor: pointer;
+    font-size: 14px;
+    text-align: left;
+    transition: all 0.2s ease;
+  }
+  
+  .dropdown-item .icon {
+    color: var(--primary-color);
+    font-size: 16px;
+  }
+  
+  .dropdown-item:hover {
+    background-color: rgba(231, 84, 128, 0.05);
+    color: var(--primary-color);
+  }
+  
+  .logout-item {
+    color: #e74c3c;
+  }
+  
+  .logout-item:hover {
+    background-color: rgba(231, 76, 60, 0.05);
+  }
+  
+  .logout-item .icon {
+    color: #e74c3c;
+  }
+  
+  /* Cart and Wishlist with Floral Styling */
+  .cart-wishlist {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+  
+  .icon-circle {
+    position: relative;
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: rgba(231, 84, 128, 0.08);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+  }
+  
+  .top-link:hover .icon-circle {
+    background: rgba(231, 84, 128, 0.12);
+    transform: translateY(-3px);
+  }
+  
+  .wish-counter,
+  .cart-counter {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background: var(--primary-color);
+    color: white;
+    font-size: 10px;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    border: 2px solid white;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  }
+  
+  .icon {
+    font-size: 16px;
+    color: var(--text-color);
+    transition: var(--transition-base);
+  }
+  
+  .wishlist-link:hover .icon, 
+  .cart-link:hover .icon {
+    color: var(--primary-color);
+  }
+  
+  /* Responsive Design */
+  @media (max-width: 992px) {
+    .welcome-text {
+      display: none;
+    }
+    
+    .user-dropdown-trigger {
+      padding: 6px 10px;
+    }
+  }
+  
+  @media (max-width: 768px) {
+    .banner-content {
+        padding: 6px 15px;
+        font-size: 13px;
+    }
+    
+    .contact-info {
+        gap: 10px;
+    }
+  
+    .info-bar-wrapper {
+      flex-direction: column;
+      gap: 15px;
+    }
+  
+    .user-actions {
+      width: 100%;
+      justify-content: space-between;
+    }
+  
+    .wishlist-text {
+      display: none;
+    }
+    
+    .brand-name {
+      font-size: 24px;
+    }
+    
+    .dropdown-menu {
+      right: -10px;
+      width: calc(100vw - 40px);
+    }
+  }
+  
+  @media (max-width: 576px) {
+    .contact-info {
+      flex-direction: column;
+      gap: 8px;
+    }
+    
+    .shop-announcement {
+      font-size: 13px;
+    }
+    
+    .contact-item:not(:first-child) {
+      display: none;
+    }
+    
+    .icon-circle {
+      width: 38px;
+      height: 38px;
+    }
+  }
+
+  /* Floral Theme Variables */
+:root {
+  --primary-color: #ff7eb3;
+  --primary-dark: #e7527b;
+  --primary-light: #ffc0d6;
+  --accent-color: #6cbf69;
+  --accent-dark: #4a9b4a;
+  --text-color: #2c3e50;
+  --text-light: #5d6d7e;
+  --text-lighter: #95a5a6;
+  --white: #ffffff;
+  --off-white: #f9f9f9;
+  --light-bg: #f5f7fa;
+  --border-color: #eaeaea;
+  --shadow-sm: 0 2px 8px rgba(231, 84, 128, 0.08);
+  --shadow-md: 0 6px 16px rgba(231, 84, 128, 0.1);
+  --shadow-lg: 0 12px 28px rgba(231, 84, 128, 0.12);
+  --radius-sm: 6px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+  --header-height: 80px;
+  --transition-base: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.container {
+  max-width: 1200px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 0 15px;
+}
+
+.banner-strip {
+  background: linear-gradient(145deg, #fff3f7 0%, #f8f1ff 100%);
+  padding: 8px 0;
+  position: relative;
+  overflow: hidden;
+  border-bottom: 1px solid rgba(231, 84, 128, 0.1);
+}
+
+.banner-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 4px 15px;
+  font-size: 14px;
+}
+
+.contact-info {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.contact-item {
+  display: flex;
+  align-items: center;
+  gap: 4px; /* Giảm gap từ 6px xuống 4px */
+  color: var(--text-light);
+  font-size: 12px; /* Giảm font-size từ 13px xuống 12px */
+}
+
+
+.contact-icon {
+  font-size: 14px;
+  color: var(--primary-color);
+}
+
+.info-bar-wrapper {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 8px 15px;
+}
+
+/* Responsive Design */
+@media (max-width: 992px) {
+  .banner-content {
+      padding: 4px 12px;
+  }
+  
+  .info-bar-wrapper {
+      padding: 6px 12px;
+  }
+}
+
+@media (max-width: 768px) {
+  .banner-content {
+      padding: 4px 10px;
+      font-size: 13px;
+  }
+  
+  .contact-info {
+      gap: 8px;
+  }
+  
+  .info-bar-wrapper {
+      padding: 6px 10px;
+  }
+}
+
+@media (max-width: 576px) {
+  .container {
+      padding: 0 10px;
+  }
+  
+  .banner-content {
+      padding: 4px 8px;
+  }
+  
+  .contact-info {
+      gap: 6px;
+  }
+  
+  .contact-item:not(:first-child) {
+      display: none;
+  }
+}
+
+@media (max-width: 576px) {
+  /* Existing mobile styles... */
+
+  /* User Dropdown Styles for Mobile */
+  .user-dropdown {
+    position: relative;
+  }
+
+  .dropdown-menu {
+    position: absolute;
+    top: calc(100% + 10px);
+    left: 50%;
+    transform: translateX(-50%) translateY(-10px);
+    width: calc(100vw - 32px);
+    max-width: 320px;
+    background: var(--white);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
+    border: 1px solid rgba(231, 84, 128, 0.1);
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 1000;
+  }
+
+  .dropdown-menu.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(-50%) translateY(0);
+  }
+
+  /* Mũi tên chỉ hướng */
+  .dropdown-menu::before {
+    content: '';
+    position: absolute;
+    top: -8px;
+    left: 50%;
+    transform: translateX(-50%) rotate(45deg);
+    width: 16px;
+    height: 16px;
+    background: var(--white);
+    border-top: 1px solid rgba(231, 84, 128, 0.1);
+    border-left: 1px solid rgba(231, 84, 128, 0.1);
+  }
+
+  /* Header của dropdown */
+  .dropdown-header {
+    padding: 16px;
+    background: linear-gradient(to right, rgba(255, 126, 179, 0.05), rgba(255, 192, 214, 0.08));
+    border-bottom: 1px solid var(--border-color);
+  }
+
+  .user-avatar-large {
+    width: 42px;
+    height: 42px;
+    font-size: 16px;
+  }
+
+  .dropdown-user-name {
+    font-size: 15px;
+    font-weight: 600;
+  }
+
+  .dropdown-user-email {
+    font-size: 12px;
+    opacity: 0.8;
+  }
+
+  /* Menu items */
+  .dropdown-item {
+    padding: 12px 16px;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border-bottom: 1px solid rgba(231, 84, 128, 0.05);
+  }
+
+  .dropdown-item:last-child {
+    border-bottom: none;
+  }
+
+  .dropdown-item .icon {
+    font-size: 18px;
+  }
+
+  /* Hiệu ứng hover */
+  .dropdown-item:active {
+    background-color: rgba(231, 84, 128, 0.1);
+  }
+}
+
+/* Thêm styles cho màn hình nhỏ hơn */
+@media (max-width: 360px) {
+  .dropdown-menu {
+    width: calc(100vw - 24px);
+  }
+
+  .dropdown-header {
+    padding: 12px;
+  }
+
+  .user-avatar-large {
+    width: 36px;
+    height: 36px;
+    font-size: 14px;
+  }
+
+  .dropdown-item {
+    padding: 10px 12px;
+    font-size: 13px;
+  }
+}
+
+/* Đảm bảo login-link và register-link có style giống nhau với chữ in đậm */
+.top-link.login-link,
+.top-link.register-link {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: rgba(231,84,128);
+  text-decoration: none;
+  font-size: 14px;
+  transition: var(--transition-base);
+  font-weight: 600; /* Chữ in đậm */
+  padding: 8px 12px;
+  border-radius: var(--radius-md);
+  position: relative;
+}
+
+.top-link.login-link:hover,
+.top-link.register-link:hover {
+  color: var(--primary-color);
+  background-color: rgba(231, 84, 128, 0.08);
+  transform: translateY(-2px);
+}
+
+/* Thêm hiệu ứng gạch chân với gradient khi hover */
+.top-link.login-link::before,
+.top-link.register-link::before {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(90deg, #ff758c, #ff7eb3);
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform 0.4s ease;
+}
+
+.top-link.login-link:hover::before,
+.top-link.register-link:hover::before {
+  transform: scaleX(1);
+  transform-origin: left;
+}
