@@ -9,9 +9,6 @@ import { motion } from 'framer-motion';
 import '../styles/HomeComponent.css';
 import '../styles/ProductSearchComponent.css'; // Import CSS phân trang
 
-// Lấy URL API từ biến môi trường
-const API_URL = process.env.REACT_APP_API_URL || 'https://webnangcao-api.onrender.com/api';
-
 // Lazy load ProductComponent for better initial load time
 const ProductComponent = lazy(() => import('./ProductComponent'));
 
@@ -263,8 +260,8 @@ class Home extends Component {
 
       // Use Promise.all for concurrent API calls
       const [newProdsResponse, hotProdsResponse] = await Promise.all([
-        axios.get(`${API_URL}/customer/products/new?limit=10&nocache=${new Date().getTime()}`),
-        axios.get(`${API_URL}/customer/products/hot?limit=10&nocache=${new Date().getTime()}`)
+        axios.get(`${this.context.apiUrl}/customer/products/new?limit=10&nocache=${new Date().getTime()}`),
+        axios.get(`${this.context.apiUrl}/customer/products/hot?limit=10&nocache=${new Date().getTime()}`)
       ]);
 
       // Filter valid products
@@ -463,7 +460,7 @@ class CategoryProducts extends Component {
       });
 
       // Build the API URL with price filter parameters if they exist
-      let apiUrl = `${API_URL}/customer/products/category/${categoryId}`;
+      let apiUrl = `${this.context.apiUrl}/customer/products/category/${categoryId}`;
       let params = [];
       
       if (minPrice) params.push(`minPrice=${minPrice}`);
@@ -477,7 +474,7 @@ class CategoryProducts extends Component {
       console.log('Fetching products with URL:', apiUrl);
 
       // Fetch the category info for display
-      const categoryResponse = await axios.get(`${API_URL}/customer/categories/${categoryId}`);
+      const categoryResponse = await axios.get(`${this.context.apiUrl}/customer/categories/${categoryId}`);
 
       // Fetch filtered products
       const productsResponse = await axios.get(apiUrl);

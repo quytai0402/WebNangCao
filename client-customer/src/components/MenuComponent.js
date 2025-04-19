@@ -5,11 +5,11 @@ import { FaSearch, FaHome, FaSortAmountDown } from 'react-icons/fa';
 import { GiFlowerPot } from 'react-icons/gi';
 import '../styles/MenuComponent.css';
 import withRouter from '../utils/withRouter';
-
-// Lấy URL API từ biến môi trường
-const API_URL = process.env.REACT_APP_API_URL || 'https://webnangcao-api.onrender.com/api';
+import MyContext from '../contexts/MyContext';
 
 class Menu extends Component {
+    static contextType = MyContext;
+    
     constructor(props) {
         super(props);
         this.state = {
@@ -51,7 +51,7 @@ class Menu extends Component {
 
     async fetchCategories() {
         try {
-            const response = await axios.get(`${API_URL}/customer/categories`);
+            const response = await axios.get(`${this.context.apiUrl}/customer/categories`);
             if (response && response.data) {
                 this.setState({ categories: response.data });
             } else {

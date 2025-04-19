@@ -10,9 +10,6 @@ import MyContext from '../contexts/MyContext'; // Nhập context để quản l�
 import { FaFilter, FaSortAmountDown, FaSearch, FaCaretDown, FaTimes, FaInfoCircle } from 'react-icons/fa';
 import LoadingSpinner from './LoadingSpinner';
 
-// Lấy URL API từ biến môi trường
-const API_URL = process.env.REACT_APP_API_URL || 'https://webnangcao-api.onrender.com/api';
-
 class AllProducts extends Component {
     static contextType = MyContext; // Xác định context mà component sẽ sử dụng
 
@@ -97,7 +94,7 @@ class AllProducts extends Component {
 
     fetchCategories = async () => {
         try {
-            const response = await axios.get(`${API_URL}/customer/categories`);
+            const response = await axios.get(`${this.context.apiUrl}/customer/categories`);
             this.setState({ categories: response.data || [] });
         } catch (error) {
             console.error('Error fetching categories:', error);
@@ -110,13 +107,13 @@ class AllProducts extends Component {
         let endpoint;
         switch (type) {
             case 'new':
-                endpoint = `${API_URL}/customer/products/new${all ? '?all=true' : ''}`;
+                endpoint = `${this.context.apiUrl}/customer/products/new${all ? '?all=true' : ''}`;
                 break;
             case 'hot':
-                endpoint = `${API_URL}/customer/products/hot${all ? '?all=true' : ''}`;
+                endpoint = `${this.context.apiUrl}/customer/products/hot${all ? '?all=true' : ''}`;
                 break;
             default:
-                endpoint = `${API_URL}/customer/products`;
+                endpoint = `${this.context.apiUrl}/customer/products`;
                 break;
         }
         

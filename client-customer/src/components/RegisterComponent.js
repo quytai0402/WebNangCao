@@ -6,9 +6,6 @@ import { toast } from 'react-toastify';
 import '../styles/RegisterComponent.css';
 import MyContext from '../contexts/MyContext';
 
-// Lấy URL API từ biến môi trường
-const API_URL = process.env.REACT_APP_API_URL || 'https://webnangcao-api.onrender.com/api';
-
 // Hàm debounce để giới hạn số lần gọi API
 function debounce(func, wait) {
     let timeout;
@@ -228,7 +225,7 @@ class Register extends Component {
             });
             
             // Gọi API kiểm tra số điện thoại với timeout
-            const res = await axios.post(`${API_URL}/customer/check-phone`, { phone }, { timeout: 5000 });
+            const res = await axios.post(`${this.context.apiUrl}/customer/check-phone`, { phone }, { timeout: 5000 });
             console.log('Kết quả kiểm tra số điện thoại:', res.data);
             
             // Nếu API không trả về success, coi như có lỗi
@@ -365,7 +362,7 @@ class Register extends Component {
         this.setState({ isProcessing: true, errorMessage: '' });
         
         try {
-            const res = await axios.post(`${API_URL}/customer/register`, account);
+            const res = await axios.post(`${this.context.apiUrl}/customer/register`, account);
             const result = res.data;
             if (result.success === true) {
                 // Chỉ cuộn lên đầu khi đăng ký thành công

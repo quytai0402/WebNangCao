@@ -7,9 +7,7 @@ import { GiFlowerPot } from 'react-icons/gi';
 import MyContext from '../contexts/MyContext';
 import '../styles/LoginComponent.css';
 import { toast } from 'react-toastify';
-
-// Lấy URL API từ biến môi trường
-const API_URL = process.env.REACT_APP_API_URL || 'https://webnangcao-api.onrender.com/api';
+import withRouter from '../utils/withRouter';
 
 class Login extends Component {
   static contextType = MyContext;
@@ -322,7 +320,7 @@ class Login extends Component {
     }
 
     try {
-      const response = await axios.post(`${API_URL}/customer/login`, {
+      const response = await axios.post(`${this.context.apiUrl}/customer/login`, {
         username: username,
         password: password
       });
@@ -377,4 +375,4 @@ class Login extends Component {
   }
 }
 
-export default Login;
+export default withRouter(Login);

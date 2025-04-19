@@ -11,9 +11,6 @@ import MyContext from '../contexts/MyContext';
 import '../styles/MyProfileComponent.css';
 import { toast } from 'react-toastify';
 
-// Lấy URL API từ biến môi trường
-const API_URL = process.env.REACT_APP_API_URL || 'https://webnangcao-api.onrender.com/api';
-
 class MyProfile extends Component {
   static contextType = MyContext;
 
@@ -71,7 +68,7 @@ class MyProfile extends Component {
         throw new Error('Unauthorized access');
       }
   
-      const response = await axios.get(`${API_URL}/customer/orders/${this.context.customer._id}`, {
+      const response = await axios.get(`${this.context.apiUrl}/customer/orders/${this.context.customer._id}`, {
         headers: { 'x-access-token': this.context.token }
       });
   
@@ -289,7 +286,7 @@ class MyProfile extends Component {
   
     try {
       const response = await axios.put(
-        `${API_URL}/customer/update-profile`,
+        `${this.context.apiUrl}/customer/update-profile`,
         { name, phone, email, address },
         { headers: { 'x-access-token': this.context.token } }
       );
@@ -344,7 +341,7 @@ class MyProfile extends Component {
 
     try {
       const response = await axios.put(
-        `${API_URL}/customer/change-password`,
+        `${this.context.apiUrl}/customer/change-password`,
         { currentPassword, newPassword },
         { headers: { 'x-access-token': this.context.token } }
       );
@@ -376,7 +373,7 @@ class MyProfile extends Component {
 
   fetchProfile = async () => {
     try {
-      const response = await axios.get(`${API_URL}/customer/profile`, {
+      const response = await axios.get(`${this.context.apiUrl}/customer/profile`, {
         headers: { 'x-access-token': this.context.token }
       });
       const customer = response.data;
@@ -417,7 +414,7 @@ class MyProfile extends Component {
     };
 
     try {
-      const response = await axios.put(`${API_URL}/customer/profile`, customer, {
+      const response = await axios.put(`${this.context.apiUrl}/customer/profile`, customer, {
         headers: { 'x-access-token': this.context.token }
       });
       if (response.data) {

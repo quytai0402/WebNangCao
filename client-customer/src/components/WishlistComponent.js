@@ -8,9 +8,6 @@ import '../styles/WishlistComponent.css';
 import { FaHeart, FaShoppingCart, FaTrash } from 'react-icons/fa';
 import CartService from './services/CartService';
 
-// Lấy URL API từ biến môi trường
-const API_URL = process.env.REACT_APP_API_URL || 'https://webnangcao-api.onrender.com/api';
-
 class WishlistComponent extends Component {
     static contextType = MyContext;
 
@@ -49,7 +46,7 @@ class WishlistComponent extends Component {
                 return;
             }
 
-            const response = await axios.get(`${API_URL}/customer/wishlist?page=${page}&limit=10`, {
+            const response = await axios.get(`${this.context.apiUrl}/customer/wishlist?page=${page}&limit=10`, {
                 headers: { 'x-access-token': token }
             });
 
@@ -91,7 +88,7 @@ class WishlistComponent extends Component {
         try {
             const token = localStorage.getItem('token');
             
-            const response = await axios.post(`${API_URL}/customer/wishlist/remove`, 
+            const response = await axios.post(`${this.context.apiUrl}/customer/wishlist/remove`, 
                 { productId },
                 { headers: { 'x-access-token': token } }
             );
@@ -134,7 +131,7 @@ class WishlistComponent extends Component {
         try {
             const token = localStorage.getItem('token');
             
-            const response = await axios.post(`${API_URL}/customer/wishlist/clear`, 
+            const response = await axios.post(`${this.context.apiUrl}/customer/wishlist/clear`, 
                 {},
                 { headers: { 'x-access-token': token } }
             );
@@ -371,7 +368,7 @@ class WishlistComponent extends Component {
             for (const item of invalidItems) {
                 try {
                     if (item._id) {
-                        await axios.post(`${API_URL}/customer/wishlist/removeById`, 
+                        await axios.post(`${this.context.apiUrl}/customer/wishlist/removeById`, 
                             { wishlistItemId: item._id },
                             { headers: { 'x-access-token': token } }
                         );
