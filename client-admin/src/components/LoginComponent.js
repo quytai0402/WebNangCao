@@ -193,11 +193,12 @@ class Login extends Component {
       const apiUrl = `${this.context.apiUrl}/admin/login`;
       console.log('Using API URL:', apiUrl);
       
-      // Add CORS headers for debugging
+      // Update axios configuration to handle CORS better
       const res = await axios.post(apiUrl, account, {
-        withCredentials: true,
+        withCredentials: false, // Change to false as credentials can cause CORS issues
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
         }
       });
       const result = res.data;
@@ -215,7 +216,9 @@ class Login extends Component {
       }
     } catch (error) {
       console.error('Lỗi Đăng Nhập:', error);
-      this.setState({ errorMessage: `Lỗi Mạng: ${error.message}. Kiểm tra kết nối với máy chủ.` });
+      this.setState({ 
+        errorMessage: `Lỗi kết nối: ${error.message || 'Không thể kết nối đến máy chủ'}. Vui lòng kiểm tra kết nối mạng và thử lại sau.` 
+      });
     }
   }
 }

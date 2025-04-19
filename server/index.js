@@ -7,10 +7,41 @@ const PORT = process.env.PORT || 3000; // Lấy cổng từ biến môi trườn
 
 // Cấu hình CORS
 app.use(cors({
-    origin: ['http://localhost:3001', 'http://localhost:3000', 'http://localhost:3002', 
-             'https://webnangcao-admin.onrender.com', 'https://webnangcao-customer.onrender.com'],
-    credentials: true // Cho phép gửi cookie và thông tin xác thực
+    origin: function(origin, callback) {
+        const allowedOrigins = [
+            'http://localhost:3000',
+            'http://localhost:3001',
+            'http://localhost:3002',
+            'https://webnangcao-admin.onrender.com',
+            'https://webnangcao-customer.onrender.com',
+            'https://webnangcao-api.onrender.com'
+        ];
+        // Cho phép không có origin (cho Postman, curl etc.)
+        if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+            callback(null, true);
+        } else {
+            console.log('CORS blocked origin:', origin);
+            callback(null, true); // Tạm thời cho phép tất cả origin trong thời gian phát triển
+        }
+    },
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'x-access-token'],
+    credentials: true,
+    preflightContinue: false,
+    optionsSuccessStatus: 204
 }));
+
+// Đặt header CORS cụ thể cho tất cả các route
+app.use((req, res, next) => {
+    res.header('Access-Control-Allow-Origin', req.headers.origin || '*');
+    res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization, x-access-token');
+    res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+    res.header('Access-Control-Allow-Credentials', 'true');
+    if (req.method === 'OPTIONS') {
+        return res.sendStatus(204);
+    }
+    next();
+});
 
 // Sử dụng parser JSON với giới hạn tăng lên và loại bỏ các parser trùng lặp.
 app.use(express.json({ limit: '100mb' })); // Thiết lập giới hạn kích thước cho dữ liệu JSON
