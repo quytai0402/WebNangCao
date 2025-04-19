@@ -241,7 +241,9 @@ class ProductDetail extends Component {
         try {
             const token = localStorage.getItem('token');
             const productId = product._id;
-            const endpoint = isInWishlist ? '/api/customer/wishlist/remove' : '/api/customer/wishlist/add';
+            const endpoint = isInWishlist 
+                ? `${this.context.apiUrl}/customer/wishlist/remove` 
+                : `${this.context.apiUrl}/customer/wishlist/add`;
             
             console.log(`Sending request to ${endpoint} for product ${productId}`);
             console.log('Token present:', !!token);

@@ -156,7 +156,9 @@ class ProductComponent extends React.Component {
         
         try {
             const isInWishlist = this.state.wishlistStatus[productId];
-            const endpoint = isInWishlist ? '/api/customer/wishlist/remove' : '/api/customer/wishlist/add';
+            const endpoint = isInWishlist 
+                ? `${this.context.apiUrl}/customer/wishlist/remove` 
+                : `${this.context.apiUrl}/customer/wishlist/add`;
             
             console.log(`Sending request to ${endpoint} for product ${productId}`);
             console.log('Request data:', { productId });

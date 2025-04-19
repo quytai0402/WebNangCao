@@ -104,7 +104,7 @@ class Login extends Component {
     this.setState({ isProcessing: true, errorMessage: '' });
 
     try {
-        const res = await axios.post('/api/customer/login', account);
+        const res = await axios.post(`${this.context.apiUrl}/customer/login`, account);
         const result = res.data;
 
         if (result.success === true) {
