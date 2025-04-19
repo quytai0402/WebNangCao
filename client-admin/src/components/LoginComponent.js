@@ -189,8 +189,10 @@ class Login extends Component {
   async apiLogin(account) {
     try {
       console.log('Logging in with account:', account.username);
+      const apiUrl = `${this.context.apiUrl}/admin/login`;
+      console.log('Using API URL:', apiUrl);
       
-      const res = await axios.post(`${this.context.apiUrl}/admin/login`, account);
+      const res = await axios.post(apiUrl, account);
       const result = res.data;
       
       console.log('Login response:', result);
@@ -206,7 +208,7 @@ class Login extends Component {
       }
     } catch (error) {
       console.error('Lỗi Đăng Nhập:', error);
-      this.setState({ errorMessage: 'Lỗi Mạng: Kiểm tra kết nối với máy chủ.' });
+      this.setState({ errorMessage: `Lỗi Mạng: ${error.message}. Kiểm tra kết nối với máy chủ.` });
     }
   }
 }
