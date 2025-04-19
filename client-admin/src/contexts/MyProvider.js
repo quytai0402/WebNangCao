@@ -8,7 +8,7 @@ class MyProvider extends Component {
     this.state = {
       token: localStorage.getItem('token') || '',
       username: localStorage.getItem('username') || '',
-      apiUrl: process.env.REACT_APP_API_URL || 'https://webnangcao-api.onrender.com/api',
+      apiUrl: process.env.REACT_APP_API_URL || 'https://webnangcao-api.onrender.com',
       setToken: this.setToken,
       setUsername: this.setUsername,
       validateToken: this.validateToken

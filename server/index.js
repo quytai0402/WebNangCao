@@ -29,6 +29,11 @@ app.use('/api/admin', adminApi); // Kết nối route '/api/admin' với adminAp
 app.use('/api/customer', require('./api/customer')); // Kết nối route '/api/customer' với các route khách hàng
 app.use('/api/chatgpt', require('./api/chatgpt')); // Kết nối route '/api/chatgpt' với các route chatgpt
 
+// Route trực tiếp không qua /api
+app.use('/admin', adminApi); // Kết nối route '/admin' với adminApi
+app.use('/customer', require('./api/customer')); // Kết nối route '/customer' với các route khách hàng
+app.use('/chatgpt', require('./api/chatgpt')); // Kết nối route '/chatgpt' với các route chatgpt
+
 // Middleware xử lý lỗi
 app.use((err, req, res, next) => {
     console.error(err.stack); // In ra stack trace của lỗi
