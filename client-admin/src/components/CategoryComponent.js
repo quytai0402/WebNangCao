@@ -263,7 +263,7 @@ class Category extends Component {
         this.setState({ isLoading: true });
         const config = { headers: { 'x-access-token': this.context.token } };
 
-        axios.get('/api/admin/categories', config)
+        axios.get(`${this.context.apiUrl}/admin/categories`, config)
             .then((res) => {
                 const data = res.data;
                 if (data.success) {
@@ -308,7 +308,7 @@ class Category extends Component {
         this.setState({ isSubmitting: true });
 
         try {
-            const response = await axios.post('/api/admin/categories',
+            const response = await axios.post(`${this.context.apiUrl}/admin/categories`,
                 { name: newCategoryName },
                 { headers: { 'x-access-token': this.context.token } }
             );

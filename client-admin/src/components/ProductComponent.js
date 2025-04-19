@@ -56,7 +56,7 @@ class Product extends Component {
 
   loadCategories = async () => {
     try {
-      const response = await axios.get('/api/admin/categories', {
+      const response = await axios.get(`${this.context.apiUrl}/admin/categories`, {
         headers: { 'x-access-token': this.context.token }
       });
 
@@ -98,7 +98,7 @@ class Product extends Component {
 
       this.setState({ isLoading: true });
 
-      const { data } = await axios.get('/api/admin/products', {
+      const { data } = await axios.get(`${this.context.apiUrl}/admin/products`, {
         headers: { 'x-access-token': this.context.token },
         params
       });

@@ -34,7 +34,7 @@ class Active extends Component {
     }
 
     // Gửi yêu cầu API để kích hoạt tài khoản
-    axios.post('/api/customer/activate', { token, id })
+    axios.post(`${this.context.apiUrl}/customer/activate`, { token, id })
       .then(response => {
         // Xử lý phản hồi từ server
         if (response.data.success) {

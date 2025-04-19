@@ -197,16 +197,20 @@ class Statistic extends Component {
     }
 
     fetchStatistics = async () => {
-        this.setState({ loading: true });
+        this.setState({ loading: true, error: null });
         try {
             const { startDate, endDate } = this.state.dateRange;
-
-            // API call to fetch statistics data
-            const response = await axios.get('/api/admin/statistics', {
+            
+            // Xử lý URL API khi local
+            if (!process.env.REACT_APP_API_URL && !window.location.origin.includes('localhost')) {
+                console.warn('REACT_APP_API_URL is not set and not running on localhost. API calls may fail.');
+            }
+            
+            const response = await axios.get(`${this.context.apiUrl}/admin/statistics`, {
                 headers: { 'x-access-token': this.context.token },
                 params: { startDate, endDate }
             });
-
+            
             if (response.data.success) {
                 const {
                     revenueData, topProducts, topCategories,
