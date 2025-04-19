@@ -103,7 +103,7 @@ class Inform extends Component {
             console.log('Fetching wishlist count with token:', token ? 'Token present' : 'No token');
             
             // Gọi API để lấy số lượng sản phẩm yêu thích
-            const response = await axios.get('/api/customer/wishlist/count', {
+            const response = await axios.get(`${this.context.apiUrl}/customer/wishlist/count`, {
                 headers: { 'x-access-token': token }
             });
             
@@ -151,12 +151,12 @@ class Inform extends Component {
             if (!token) return;
 
             // Gọi API kiểm tra token
-            const response = await axios.get('/api/customer/validate-token');
+            const response = await axios.get(`${this.context.apiUrl}/customer/validate-token`);
             
             if (!response.data.valid) {
                 // Thử làm mới token trước khi đăng xuất
                 try {
-                    const refreshResponse = await axios.post('/api/customer/refresh-token', {}, {
+                    const refreshResponse = await axios.post(`${this.context.apiUrl}/customer/refresh-token`, {}, {
                         headers: { 'x-access-token': token }
                     });
                     

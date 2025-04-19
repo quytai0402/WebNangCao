@@ -44,7 +44,7 @@ class ProductComponent extends React.Component {
             // Check each product individually to avoid race conditions
             for (const product of products) {
                 try {
-                    const response = await axios.get(`/api/customer/wishlist/check/${product._id}`, {
+                    const response = await axios.get(`${this.context.apiUrl}/customer/wishlist/check/${product._id}`, {
                         headers: { 'x-access-token': token }
                     });
                     

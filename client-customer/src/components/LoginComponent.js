@@ -64,7 +64,7 @@ class Login extends Component {
   // Validate token function
   validateToken = async (token) => {
     try {
-      const response = await axios.get('/api/customer/validate-token', {
+      const response = await axios.get(`${this.context.apiUrl}/customer/validate-token`, {
         headers: { 'x-access-token': token }
       });
       return response.data.valid === true;

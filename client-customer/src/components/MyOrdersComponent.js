@@ -48,20 +48,16 @@ class MyOrders extends Component {
 
     loadOrders = async () => {
         try {
-            const token = localStorage.getItem('token');
-            const customerStr = localStorage.getItem('customer');
-
-            if (!token || !customerStr) {
+            const customer = this.context.customer;
+            if (!customer || !customer._id) {
                 throw new Error('Vui lòng đăng nhập để xem đơn hàng');
             }
 
-            const customer = JSON.parse(customerStr);
             this.setState({ loading: true, error: null });
+            const token = this.context.token;
 
-            const response = await axios.get(`/api/customer/orders/${customer._id}`, {
-                headers: {
-                    'x-access-token': token
-                }
+            const response = await axios.get(`${this.context.apiUrl}/customer/orders/${customer._id}`, {
+                headers: { 'x-access-token': token }
             });
 
             if (response.data && response.data.success) {

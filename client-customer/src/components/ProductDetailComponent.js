@@ -62,7 +62,7 @@ class ProductDetail extends Component {
         this.setState({ loading: true, error: null, product: null });
         
         try {
-            const res = await axios.get(`/api/customer/products/${id}`);
+            const res = await axios.get(`${this.context.apiUrl}/customer/products/${id}`);
             
             // Check if the response indicates a product not found or deleted
             if (!res.data || res.data.success === false) {
@@ -109,7 +109,7 @@ class ProductDetail extends Component {
             const token = localStorage.getItem('token');
             if (!token) return;
             
-            const response = await axios.get(`/api/customer/wishlist/check/${productId}`, {
+            const response = await axios.get(`${this.context.apiUrl}/customer/wishlist/check/${productId}`, {
                 headers: { 'x-access-token': token }
             });
             
@@ -131,8 +131,8 @@ class ProductDetail extends Component {
             
             // Fetch related products, reviews, or other supplementary data
             const [relatedProductsRes, recommendedProductsRes] = await Promise.allSettled([
-                axios.get(`/api/customer/products/related/${productId}`),
-                axios.get(`/api/customer/products/recommended/${productId}`)
+                axios.get(`${this.context.apiUrl}/customer/products/related/${productId}`),
+                axios.get(`${this.context.apiUrl}/customer/products/recommended/${productId}`)
             ]);
             
             // Update state with additional data

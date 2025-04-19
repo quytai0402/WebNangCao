@@ -293,7 +293,7 @@ class CheckoutComponent extends Component {
   fetchProvinces = async () => {
     this.setState({ isLoadingLocations: true });
     try {
-      const response = await axios.get('/api/customer/provinces');
+      const response = await axios.get(`${this.context.apiUrl}/customer/provinces`);
       this.setState({
         provinces: response.data,
         isLoadingLocations: false
@@ -308,7 +308,7 @@ class CheckoutComponent extends Component {
   fetchDistricts = async (provinceCode) => {
     this.setState({ isLoadingLocations: true, districts: [], wards: [], selectedDistrict: '', selectedWard: '' });
     try {
-      const response = await axios.get(`/api/customer/provinces/${provinceCode}`, {
+      const response = await axios.get(`${this.context.apiUrl}/provinces/${provinceCode}`, {
         params: { depth: 2 }
       });
       this.setState({
@@ -327,7 +327,7 @@ class CheckoutComponent extends Component {
   fetchWards = async (districtCode) => {
     this.setState({ isLoadingLocations: true, wards: [], selectedWard: '' });
     try {
-      const response = await axios.get(`/api/customer/districts/${districtCode}`, {
+      const response = await axios.get(`${this.context.apiUrl}/districts/${districtCode}`, {
         params: { depth: 2 }
       });
       this.setState({
@@ -615,7 +615,7 @@ class CheckoutComponent extends Component {
     this.setState({ loginProcessing: true });
 
     try {
-      const response = await axios.post('/api/customer/login', {
+      const response = await axios.post(`${this.context.apiUrl}/customer/login`, {
         username: loginUsername,
         password: loginPassword
       });
@@ -720,7 +720,7 @@ class CheckoutComponent extends Component {
       }
 
       // Send order to backend
-      const response = await axios.post('/api/customer/checkout', orderData, { headers });
+      const response = await axios.post(`${this.context.apiUrl}/customer/checkout`, orderData, { headers });
       console.log('Checkout response:', response.data);
 
       if (response.data && response.data.success) {
