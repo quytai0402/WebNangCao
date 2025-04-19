@@ -24,7 +24,7 @@ import ChatbotComponent from './ChatbotComponent'; // Nhập component ChatbotCo
 import { FaChevronUp } from 'react-icons/fa'; // Import icon cho nút back-to-top
 
 // Lấy URL API từ biến môi trường
-const API_URL = process.env.REACT_APP_API_URL || 'https://webnangcao-api.onrender.com/api';
+const API_URL = process.env.REACT_APP_API_URL || 'https://webnangcao-api.onrender.com';
 
 // CSS cho nút back-to-top
 const backToTopStyles = {

@@ -168,7 +168,7 @@ class AllProducts extends Component {
         }
 
         try {
-            const res = await axios.post('/api/customer/wishlist/add',
+            const res = await axios.post(`${this.context.apiUrl}/customer/wishlist/add`,
                 { productId }, // Gửi productId
                 { headers: { 'x-access-token': this.context.token } } // Thêm header với token
             );
