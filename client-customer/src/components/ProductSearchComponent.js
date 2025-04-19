@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
-import { withRouter } from '../utlis/withRouter';
+import { withRouter } from '../utils/withRouter';
 import axios from 'axios';
 // import { FaEye, FaShoppingCart, FaHeart, FaLeaf, FaFolder, FaArrowRight } from 'react-icons/fa';
 import { FaLeaf } from 'react-icons/fa';

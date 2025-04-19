@@ -7,7 +7,7 @@ import {
 import { GiFlowerPot } from 'react-icons/gi';
 import MyContext from '../contexts/MyContext';
 import '../styles/InformComponent.css';
-import withRouter from '../utlis/withRouter';
+import withRouter from '../utils/withRouter';
 import { toast } from 'react-toastify';
 import axios from 'axios';
 

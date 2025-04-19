@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { FaHeart, FaShieldAlt, FaShoppingCart, FaTruck, FaUndoAlt, FaShare } from 'react-icons/fa';
 import axios from 'axios';
 import { toast } from 'react-toastify';
-import withRouter from '../utlis/withRouter';
+import withRouter from '../utils/withRouter';
 import MyContext from '../contexts/MyContext';
 import CartService from './services/CartService';
 import CommentComponent from './CommentComponent';

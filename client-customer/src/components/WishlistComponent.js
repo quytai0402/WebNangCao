@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import MyContext from '../contexts/MyContext';
-import withRouter from '../utlis/withRouter';
+import withRouter from '../utils/withRouter';
 import '../styles/WishlistComponent.css';
 import { FaHeart, FaShoppingCart, FaTrash } from 'react-icons/fa';
 import CartService from './services/CartService';
