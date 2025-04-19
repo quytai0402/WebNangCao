@@ -135,7 +135,15 @@ class Login extends Component {
             this.context.setCustomer(result.customer);
 
             toast.success('Đăng nhập thành công!');
-            this.setState({ redirect: true });
+            
+            // Sử dụng router navigate để chuyển trang mượt mà
+            const returnUrl = localStorage.getItem('returnUrl') || '/';
+            localStorage.removeItem('returnUrl');
+            
+            // Thêm một chút độ trễ để hiệu ứng mượt mà hơn
+            setTimeout(() => {
+                this.props.router.navigate(returnUrl, { replace: true });
+            }, 300);
         } else {
             this.setState({ 
                 errorMessage: result.message || 'Đăng nhập thất bại',
@@ -160,12 +168,11 @@ class Login extends Component {
 };
 
   render() {
-    if (this.state.redirect || this.context.token) {
-      return <Navigate to="/" />;
-    }
-
-    if (this.state.redirectToHome) {
-      return <Navigate replace to="/" />;
+    // Nếu đã có token, điều hướng đến trang chủ
+    if (this.context.token) {
+      const returnUrl = localStorage.getItem('returnUrl') || '/';
+      localStorage.removeItem('returnUrl');
+      return <Navigate to={returnUrl} replace />;
     }
 
     const loginCardClass = `login-card ${this.state.mounted ? 'login-card-mounted' : ''}`;

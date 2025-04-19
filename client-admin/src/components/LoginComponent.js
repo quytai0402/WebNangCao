@@ -6,7 +6,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 // Thêm những import cho biểu tượng
 import { FaUser, FaLock } from 'react-icons/fa';
 import { GiFlowerPot } from 'react-icons/gi';
-
+import withRouter from '../utils/withRouter';
 
 class Login extends Component {
   static contextType = MyContext;
@@ -16,7 +16,7 @@ class Login extends Component {
     this.state = {
       txtUsername: '',
       txtPassword: '',
-      redirect: false,
+      isLoggingIn: false,
       errorMessage: ''
     };
   }
@@ -27,12 +27,14 @@ class Login extends Component {
     if (token && username) {
       this.context.setToken(token);
       this.context.setUsername(username);
+      this.props.router.navigate('/admin', { replace: true });
     }
   }
 
   render() {
-    if (this.state.redirect || this.context.token !== '') {
-      return <Navigate to="/admin" />;
+    // Nếu đã có token, điều hướng đến trang admin
+    if (this.context.token !== '') {
+      return <Navigate to="/admin" replace />;
     }
 
     return (
@@ -107,6 +109,7 @@ class Login extends Component {
                     }}
                     value={this.state.txtUsername}
                     onChange={(e) => this.setState({ txtUsername: e.target.value })}
+                    disabled={this.state.isLoggingIn}
                   />
                 </div>
               </div>
@@ -138,6 +141,7 @@ class Login extends Component {
                     }}
                     value={this.state.txtPassword}
                     onChange={(e) => this.setState({ txtPassword: e.target.value })}
+                    disabled={this.state.isLoggingIn}
                   />
                 </div>
               </div>
@@ -154,18 +158,22 @@ class Login extends Component {
                     color: 'white',
                     border: 'none',
                     boxShadow: '0 4px 15px rgba(255, 117, 140, 0.2)',
-                    transition: 'all 0.3s ease'
+                    transition: 'all 0.3s ease',
+                    opacity: this.state.isLoggingIn ? 0.7 : 1
                   }}
                   onMouseOver={(e) => {
-                    e.target.style.transform = 'translateY(-2px)';
-                    e.target.style.boxShadow = '0 6px 20px rgba(255, 117, 140, 0.3)';
+                    if (!this.state.isLoggingIn) {
+                      e.target.style.transform = 'translateY(-2px)';
+                      e.target.style.boxShadow = '0 6px 20px rgba(255, 117, 140, 0.3)';
+                    }
                   }}
                   onMouseOut={(e) => {
                     e.target.style.transform = 'translateY(0)';
                     e.target.style.boxShadow = '0 4px 15px rgba(255, 117, 140, 0.2)';
                   }}
+                  disabled={this.state.isLoggingIn}
                 >
-                  Đăng Nhập
+                  {this.state.isLoggingIn ? 'Đang Đăng Nhập...' : 'Đăng Nhập'}
                 </button>
               </div>
             </form>
@@ -179,6 +187,7 @@ class Login extends Component {
     e.preventDefault();
     const { txtUsername, txtPassword } = this.state;
     if (txtUsername && txtPassword) {
+      this.setState({ isLoggingIn: true, errorMessage: '' });
       const account = { username: txtUsername, password: txtPassword };
       this.apiLogin(account);
     } else {
@@ -209,18 +218,26 @@ class Login extends Component {
         console.log('Login successful, token:', result.token);
         this.context.setToken(result.token);
         this.context.setUsername(account.username);
-        this.setState({ redirect: true });
+        
+        // Sử dụng chuyển hướng React Router thay vì redirect state
+        setTimeout(() => {
+          this.props.router.navigate('/admin', { replace: true });
+        }, 300); // Thêm một chút độ trễ để hiệu ứng mượt mà hơn
       } else {
         console.log('Login failed:', result.message);
-        this.setState({ errorMessage: result.message });
+        this.setState({ 
+          errorMessage: result.message,
+          isLoggingIn: false
+        });
       }
     } catch (error) {
       console.error('Lỗi Đăng Nhập:', error);
       this.setState({ 
-        errorMessage: `Lỗi kết nối: ${error.message || 'Không thể kết nối đến máy chủ'}. Vui lòng kiểm tra kết nối mạng và thử lại sau.` 
+        errorMessage: `Lỗi kết nối: ${error.message || 'Không thể kết nối đến máy chủ'}. Vui lòng kiểm tra kết nối mạng và thử lại sau.`,
+        isLoggingIn: false
       });
     }
   }
 }
 
-export default Login;
+export default withRouter(Login);
