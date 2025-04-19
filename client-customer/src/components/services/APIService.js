@@ -1,6 +1,8 @@
 import axios from 'axios';
 
-const BASE_URL = 'http://localhost:3000/api/customer';
+const BASE_URL = process.env.REACT_APP_API_URL 
+    ? `${process.env.REACT_APP_API_URL}/customer` 
+    : 'https://webnangcao-api.onrender.com/api/customer';
 
 class APIService {
     // Phương thức tạo headers với token

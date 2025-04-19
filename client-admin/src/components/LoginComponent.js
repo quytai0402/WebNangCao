@@ -190,7 +190,7 @@ class Login extends Component {
     try {
       console.log('Logging in with account:', account.username);
       
-      const res = await axios.post('http://localhost:3000/api/admin/login', account);
+      const res = await axios.post(`${this.context.apiUrl}/admin/login`, account);
       const result = res.data;
       
       console.log('Login response:', result);
