@@ -73,7 +73,7 @@ class Order extends Component {
             console.log("Gửi thông báo trạng thái:", payload);
 
             const response = await axios.post(
-                `/api/admin/orders/${selectedOrder._id}/send-status-notification`,
+                `${this.context.apiUrl}/admin/orders/${selectedOrder._id}/send-status-notification`,
                 payload,
                 { headers: { 'x-access-token': this.context.token } }
             );
@@ -240,7 +240,7 @@ class Order extends Component {
             
             // Fetch orders
             const response = await axios.get(
-                `/api/admin/orders?${params.toString()}`,
+                `${this.context.apiUrl}/admin/orders?${params.toString()}`,
                 { headers: { 'x-access-token': this.context.token } }
             );
             
@@ -268,7 +268,7 @@ class Order extends Component {
         try {
             this.setState({ exporting: true });
             const response = await axios.get(
-                `/api/admin/orders/${selectedOrder._id}/export`,
+                `${this.context.apiUrl}/admin/orders/${selectedOrder._id}/export`,
                 {
                     headers: { 'x-access-token': this.context.token },
                     responseType: 'blob'
@@ -306,7 +306,7 @@ class Order extends Component {
                 selectedOrder: null
             });
             
-            const response = await axios.get(`/api/admin/orders/${orderId}`, {
+            const response = await axios.get(`${this.context.apiUrl}/admin/orders/${orderId}`, {
                 headers: { 'x-access-token': this.context.token }
             });
             
@@ -341,7 +341,7 @@ class Order extends Component {
         try {
             this.setState({ updatingStatus: true });
             const response = await axios.put(
-                `/api/admin/orders/${orderId}/status`,
+                `${this.context.apiUrl}/admin/orders/${orderId}/status`,
                 { status: newStatus },
                 { headers: { 'x-access-token': this.context.token } }
             );
@@ -390,7 +390,7 @@ class Order extends Component {
             console.log("Gửi thông tin khách hàng:", payload);
 
             const response = await axios.post(
-                `/api/admin/orders/${selectedOrder._id}/send-confirmation`,
+                `${this.context.apiUrl}/admin/orders/${selectedOrder._id}/send-confirmation`,
                 payload,
                 { headers: { 'x-access-token': this.context.token } }
             );
@@ -489,7 +489,7 @@ class Order extends Component {
         if (window.confirm('Bạn có chắc chắn muốn xóa đơn hàng này?')) {
             try {
                 const response = await axios.delete(
-                    `/api/admin/orders/${orderId}`,
+                    `${this.context.apiUrl}/admin/orders/${orderId}`,
                     { headers: { 'x-access-token': this.context.token } }
                 );
 

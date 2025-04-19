@@ -118,7 +118,7 @@ class ProductDetail extends Component {
 
   apiGetCategories() {
     const config = { headers: { 'x-access-token': this.context.token } };
-    axios.get('/api/admin/categories', config)
+    axios.get(`${this.context.apiUrl}/admin/categories`, config)
       .then((res) => {
         const result = res.data;
         const categories = Array.isArray(result.categories) ? result.categories : [];
@@ -167,7 +167,7 @@ btnAddClick = async (e) => {
     }
 
     console.log('Sending product data to server...');
-    const response = await axios.post('/api/admin/products', formData, {
+    const response = await axios.post(`${this.context.apiUrl}/admin/products`, formData, {
       headers: {
         'x-access-token': this.context.token,
         'Content-Type': 'multipart/form-data'
@@ -225,7 +225,7 @@ btnUpdateClick = async (e) => {
     }
 
     const response = await axios.put(
-      `/api/admin/products/${txtID}`,
+      `${this.context.apiUrl}/admin/products/${txtID}`,
       prod,
       { headers: { 'x-access-token': this.context.token } }
     );
@@ -253,7 +253,7 @@ btnDeleteClick = async (e) => {
   if (window.confirm('Bạn có chắc muốn xóa sản phẩm này?')) {
     this.setState({ isLoading: true });
     try {
-      const response = await axios.delete(`/api/admin/products/${txtID}`, {
+      const response = await axios.delete(`${this.context.apiUrl}/admin/products/${txtID}`, {
         headers: { 'x-access-token': this.context.token }
       });
 
@@ -284,7 +284,7 @@ btnDeleteClick = async (e) => {
 
   apiPostProduct(prod) {
     const config = { headers: { 'x-access-token': this.context.token } };
-    axios.post('/api/admin/products', prod, config)
+    axios.post(`${this.context.apiUrl}/admin/products`, prod, config)
       .then((res) => {
         const result = res.data;
         if (result) {

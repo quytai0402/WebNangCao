@@ -120,7 +120,7 @@ class Customer extends Component {
         this.setState({ loading: true });
 
         try {
-            const response = await axios.get('/api/admin/customers', {
+            const response = await axios.get(`${this.context.apiUrl}/admin/customers`, {
                 headers: { 'x-access-token': this.context.token },
                 params: {
                     page,
@@ -165,7 +165,7 @@ class Customer extends Component {
                 selectedOrder: null
             });
 
-            const response = await axios.get(`/api/admin/orders/${orderId}`, {
+            const response = await axios.get(`${this.context.apiUrl}/admin/orders/${orderId}`, {
                 headers: { 'x-access-token': this.context.token }
             });
 
@@ -232,7 +232,7 @@ class Customer extends Component {
                 this.setState({ loading: true });
 
                 const response = await axios.put(
-                    `/api/admin/customers/${customerId}/status/${newStatus}`,
+                    `${this.context.apiUrl}/admin/customers/${customerId}/status/${newStatus}`,
                     {},
                     { headers: { 'x-access-token': this.context.token } }
                 );
@@ -267,7 +267,7 @@ class Customer extends Component {
         if (window.confirm(`Bạn có chắc muốn xóa khách hàng "${customerName}"?`)) {
             try {
                 const response = await axios.delete(
-                    `/api/admin/customers/${customerId}`,
+                    `${this.context.apiUrl}/admin/customers/${customerId}`,
                     { headers: { 'x-access-token': this.context.token } }
                 );
 
@@ -298,7 +298,7 @@ class Customer extends Component {
     
         try {
             // Sửa đổi URL API để chỉ trả về đơn hàng thuộc về chính xác khách hàng này
-            const response = await axios.get(`/api/admin/customers/${customer._id}/orders`, {
+            const response = await axios.get(`${this.context.apiUrl}/admin/customers/${customer._id}/orders`, {
                 headers: { 'x-access-token': this.context.token },
                 params: {
                     exactMatch: true // Thêm tham số để API biết chỉ lấy đơn hàng chính xác của khách hàng
@@ -438,7 +438,7 @@ class Customer extends Component {
             this.setState({ loading: true });
 
             const response = await axios.put(
-                `/api/admin/customers/${customerId}/password`,
+                `${this.context.apiUrl}/admin/customers/${customerId}/password`,
                 { password: newPassword },
                 { headers: { 'x-access-token': this.context.token } }
             );
@@ -468,7 +468,7 @@ class Customer extends Component {
             }
 
             const response = await axios.put(
-                `/api/admin/customers/${customerId}/activate`,
+                `${this.context.apiUrl}/admin/customers/${customerId}/activate`,
                 {},
                 { headers: { 'x-access-token': this.context.token } }
             );

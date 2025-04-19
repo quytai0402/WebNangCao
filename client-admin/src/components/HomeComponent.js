@@ -54,7 +54,7 @@ const Home = () => {
   const loadDashboardData = async () => {
     setLoading(true);
     try {
-      const response = await axios.get('/api/admin/dashboard', {
+      const response = await axios.get(`${context.apiUrl}/admin/dashboard`, {
         headers: { 'x-access-token': context.token }
       });
 
