@@ -22,6 +22,10 @@ import ResetPassword from './ResetPasswordComponent';
 import WishlistComponent from './WishlistComponent'; // Nhập component WishlistComponent
 import ChatbotComponent from './ChatbotComponent'; // Nhập component ChatbotComponent
 import { FaChevronUp } from 'react-icons/fa'; // Import icon cho nút back-to-top
+
+// Lấy URL API từ biến môi trường
+const API_URL = process.env.REACT_APP_API_URL || 'https://webnangcao-api.onrender.com/api';
+
 // CSS cho nút back-to-top
 const backToTopStyles = {
     button: {
@@ -147,7 +151,7 @@ class Main extends Component {
 
     fetchCategories = async () => {
         try {
-            const response = await axios.get('/api/customer/categories'); // Gọi API để lấy danh mục sản phẩm
+            const response = await axios.get(`${API_URL}/customer/categories`); // Gọi API để lấy danh mục sản phẩm
             this.setState({
                 categories: response.data, // Cập nhật danh mục sản phẩm vào state
                 isLoading: false // Đặt trạng thái loading thành false

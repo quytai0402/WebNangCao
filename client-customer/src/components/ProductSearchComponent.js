@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
+import { withRouter } from '../utlis/withRouter';
 import axios from 'axios';
 // import { FaEye, FaShoppingCart, FaHeart, FaLeaf, FaFolder, FaArrowRight } from 'react-icons/fa';
 import { FaLeaf } from 'react-icons/fa';
@@ -9,6 +10,9 @@ import CartService from './services/CartService';
 import ProductComponent from './ProductComponent';
 import '../styles/ProductComponent.css'; // Thêm để có đồng nhất style với ProductComponent
 import '../styles/ProductSearchComponent.css'; // CSS cho phân trang
+
+// Lấy URL API từ biến môi trường
+const API_URL = process.env.REACT_APP_API_URL || 'https://webnangcao-api.onrender.com/api';
 
 class ProductSearch extends Component {
     static contextType = MyContext;
@@ -40,7 +44,7 @@ class ProductSearch extends Component {
 
     fetchCategories = async () => {
         try {
-            const response = await axios.get('/api/customer/categories');
+            const response = await axios.get(`${API_URL}/customer/categories`);
             const categoriesMap = {};
             response.data.forEach(category => {
                 categoriesMap[category._id] = category.name;
@@ -59,7 +63,7 @@ class ProductSearch extends Component {
         this.setState({ isLoading: true, keyword });
 
         try {
-            const response = await axios.get(`/api/customer/products/search/${keyword}`);
+            const response = await axios.get(`${API_URL}/customer/products/search/${keyword}`);
             this.setState({
                 products: response.data || [],
                 isLoading: false,
@@ -134,7 +138,7 @@ class ProductSearch extends Component {
         }
 
         try {
-            const res = await axios.post('/api/customer/wishlist/add',
+            const res = await axios.post(`${API_URL}/customer/wishlist/add`,
                 { productId },
                 { headers: { 'x-access-token': token } }
             );
@@ -325,4 +329,4 @@ class ProductSearch extends Component {
     }
 }
 
-export default ProductSearch;
+export default withRouter(ProductSearch);
