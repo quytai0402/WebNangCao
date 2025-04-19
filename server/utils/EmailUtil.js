@@ -1,49 +1,51 @@
-const nodemailer = require('nodemailer');
-require('dotenv').config();
+const nodemailer = require('nodemailer'); // Nhập thư viện nodemailer để gửi email
+require('dotenv').config(); // Tải các biến môi trường từ file .env
 
+// Tạo đối tượng transporter để gửi email thông qua SMTP
 const transporter = nodemailer.createTransport({
-    host: process.env.SMTP_HOST,
-    port: parseInt(process.env.SMTP_PORT),
-    secure: process.env.SMTP_PORT === '465',
+    host: process.env.SMTP_HOST, // Địa chỉ máy chủ SMTP
+    port: parseInt(process.env.SMTP_PORT), // Cổng SMTP
+    secure: process.env.SMTP_PORT === '465', // Xác định kết nối có bảo mật hay không dựa trên cổng
     auth: {
-        user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASS
+        user: process.env.SMTP_USER, // Tên người dùng SMTP
+        pass: process.env.SMTP_PASS // Mật khẩu SMTP
     }
 });
 
+// Hàm định dạng số tiền thành chuỗi tiền tệ Việt Nam (VND)
 const formatCurrency = (amount) => {
-    // Ensure amount is a valid number
+    // Đảm bảo amount là một số hợp lệ
     if (amount === undefined || amount === null || isNaN(amount)) {
         amount = 0;
     }
     return new Intl.NumberFormat('vi-VN', {
-        style: 'currency',
-        currency: 'VND',
-        minimumFractionDigits: 0
+        style: 'currency', // Định dạng kiểu tiền tệ
+        currency: 'VND', // Đơn vị tiền tệ là đồng Việt Nam
+        minimumFractionDigits: 0 // Không hiển thị phần thập phân
     }).format(amount);
 };
 
-// Thông tin tài khoản ngân hàng
+// Thông tin tài khoản ngân hàng dùng để thanh toán
 const bankInfo = {
-    accountName: process.env.BANK_ACCOUNT_NAME || 'TRAN QUY TAI',
-    accountNumber: process.env.BANK_ACCOUNT_NUMBER || '8866997979',
-    bankName: process.env.BANK_NAME || 'TECHCOMBANK',
-    branch: process.env.BANK_BRANCH || 'Chi nhánh TP.HCM',
-    swift: process.env.BANK_SWIFT || 'VTCBVNVX'
+    accountName: process.env.BANK_ACCOUNT_NAME || 'TRAN QUY TAI', // Tên chủ tài khoản
+    accountNumber: process.env.BANK_ACCOUNT_NUMBER || '8866997979', // Số tài khoản
+    bankName: process.env.BANK_NAME || 'TECHCOMBANK', // Tên ngân hàng
+    branch: process.env.BANK_BRANCH || 'Chi nhánh TP.HCM', // Chi nhánh ngân hàng
+    swift: process.env.BANK_SWIFT || 'VTCBVNVX' // Mã SWIFT
 };
 
-// Function to calculate shipping fee
+// Hàm tính phí vận chuyển dựa trên tổng giá trị đơn hàng
 const calculateShippingFee = (subtotal) => {
-    return 0;
+    return 0; // Hiện tại miễn phí vận chuyển
 };
 
-// Hàm tạo URL QR code cho chuyển khoản
+// Hàm tạo URL QR code cho chuyển khoản ngân hàng
 const generateQRCodeURL = (orderId, amount) => {
     try {
         // Chuẩn bị thông tin cho mã QR VietQR
         // Format theo chuẩn ngân hàng Việt Nam
         const formattedAmount = Math.floor(amount); // Làm tròn số tiền, bỏ phần thập phân
-        const orderIdFormatted = orderId.toString().replace(/[^a-zA-Z0-9]/g, '').substring(0, 20);
+        const orderIdFormatted = orderId.toString().replace(/[^a-zA-Z0-9]/g, '').substring(0, 20); // Định dạng ID đơn hàng
         
         // Chuẩn bị thông tin cần thiết cho VietQR
         const bankId = "970407"; // Mã ngân hàng TECHCOMBANK
@@ -54,43 +56,43 @@ const generateQRCodeURL = (orderId, amount) => {
         // Tạo URL cho VietQR API - đảm bảo sử dụng HTTPS
         return `https://img.vietqr.io/image/${bankId}-${accountNo}-${template}.png?amount=${formattedAmount}&addInfo=${encodeURIComponent(content)}&accountName=${encodeURIComponent(bankInfo.accountName)}`;
     } catch (error) {
-        console.error('Error generating VietQR URL, using fallback:', error);
+        console.error('Error generating VietQR URL, using fallback:', error); // Ghi log lỗi
         
-        // Phương thức dự phòng: Sử dụng Google Chart API
+        // Phương thức dự phòng: Sử dụng Google Chart API khi VietQR gặp vấn đề
         const accountNo = bankInfo.accountNumber.replace(/\s+/g, '');
         const fallbackContent = `${bankInfo.bankName}|${accountNo}|${bankInfo.accountName}|${amount}|Thanh toan don hang ${orderId}`;
         return `https://chart.googleapis.com/chart?cht=qr&chs=300x300&chl=${encodeURIComponent(fallbackContent)}&choe=UTF-8`;
     }
 };
 
-// Helper function to ensure product data is properly populated in order items
+// Hàm chuẩn bị dữ liệu sản phẩm trong đơn hàng để hiển thị trong email
 const prepareOrderItems = (items) => {
     if (!items || !Array.isArray(items)) {
-        console.log('prepareOrderItems received invalid items:', items);
+        console.log('prepareOrderItems received invalid items:', items); // Ghi log khi dữ liệu không hợp lệ
         return [];
     }
     
-    console.log('prepareOrderItems received items array of length:', items.length);
+    console.log('prepareOrderItems received items array of length:', items.length); // Ghi log độ dài mảng sản phẩm
     
     return items.map((item, index) => {
         try {
-            // Log the complete item structure for debugging
+            // Ghi log cấu trúc đầy đủ của item để gỡ lỗi
             console.log(`Processing item ${index}:`, JSON.stringify(item, null, 2));
             
-            // Case 1: Handle when item.product is already a complete object
+            // Trường hợp 1: Xử lý khi item.product đã là một đối tượng đầy đủ
             if (item.product && typeof item.product === 'object' && 
                 item.product.name && item.product._id) {
                 
                 console.log(`Item ${index} is already in normalized format`);
                 
-                // Just fix the image URL if needed
+                // Chỉ sửa URL hình ảnh nếu cần
                 let processedImage = item.product.image;
                 if (processedImage && !processedImage.startsWith('http')) {
                     const apiUrl = process.env.API_URL || 'http://localhost:8000';
                     const imagePath = processedImage.startsWith('/') ? processedImage : `/${processedImage}`;
                     processedImage = `${apiUrl}${imagePath}`;
                 } else if (!processedImage) {
-                    // Use a better default than placeholder
+                    // Sử dụng hình ảnh mặc định tốt hơn
                     processedImage = '/images/product-default.jpg';
                 }
                 
@@ -107,16 +109,16 @@ const prepareOrderItems = (items) => {
                 };
             }
             
-            // Case 2: If we just have a product ID, try to fetch the product from the database
+            // Trường hợp 2: Nếu chỉ có ID sản phẩm, cố gắng lấy sản phẩm từ cơ sở dữ liệu
             if (typeof item.product === 'string' && item.product) {
                 console.log(`Item ${index} - Product is a string ID:`, item.product);
                 
-                // NOTE: This section won't work because we can't use await in this context
-                // The original code was incorrectly treating an async call as sync
-                // We need to use a synchronous approach or modify the overall function
+                // LƯU Ý: Phần này sẽ không hoạt động vì không thể sử dụng await trong ngữ cảnh này
+                // Mã ban đầu đã xử lý không đúng cuộc gọi bất đồng bộ như đồng bộ
+                // Cần sử dụng phương pháp đồng bộ hoặc sửa đổi hàm tổng thể
                 try {
                     const Models = require('../models/Models');
-                    // Create a minimal product object with the ID we have
+                    // Tạo đối tượng sản phẩm tối thiểu với ID mà chúng ta có
                     return {
                         product: {
                             _id: item.product,
@@ -129,15 +131,15 @@ const prepareOrderItems = (items) => {
                         totalPrice: (item.price || 0) * (item.quantity || 1)
                     };
                 } catch (err) {
-                    console.error(`Error handling product with ID ${item.product}:`, err);
+                    console.error(`Error handling product with ID ${item.product}:`, err); // Ghi log lỗi
                 }
             }
             
-            // Extract available information from item
+            // Trích xuất thông tin có sẵn từ item
             let productId = '', productName = '', productImage = '', productPrice = 0;
             
             if (typeof item.product === 'object' && item.product !== null) {
-                // If product is an object
+                // Nếu product là một đối tượng
                 console.log(`Item ${index} - Product is an object:`, JSON.stringify(item.product, null, 2));
                 productId = item.product._id || '';
                 productName = item.product.name || 'Sản phẩm đã bị xóa khỏi hệ thống';
@@ -145,31 +147,31 @@ const prepareOrderItems = (items) => {
                 productPrice = item.price || item.product.price || 0;
                 console.log(`Item ${index} - Extracted data:`, { productId, productName, productImage, productPrice });
             } else {
-                // Use item information directly if available
+                // Sử dụng thông tin item trực tiếp nếu có sẵn
                 productId = '';
                 productName = 'Sản phẩm đã bị xóa khỏi hệ thống';
                 productImage = '';
                 productPrice = item.price || 0;
             }
             
-            // Prepare image URL - Fix the URL construction
+            // Chuẩn bị URL hình ảnh - Sửa lỗi xây dựng URL
             let processedImage = '';
             console.log(`Item ${index} - Raw image path:`, productImage);
             
             if (productImage) {
                 if (productImage.startsWith('http')) {
-                    // If already a full URL, use as is
+                    // Nếu đã là URL đầy đủ, sử dụng nguyên bản
                     processedImage = productImage;
                     console.log(`Item ${index} - Image is already a full URL:`, processedImage);
                 } else {
-                    // Otherwise, add the API URL prefix - Fix: ensure path starts with /
+                    // Ngược lại, thêm tiền tố URL API - Sửa: đảm bảo đường dẫn bắt đầu bằng /
                     const apiUrl = process.env.API_URL || 'http://localhost:8000';
                     const imagePath = productImage.startsWith('/') ? productImage : `/${productImage}`;
                     processedImage = `${apiUrl}${imagePath}`;
                     console.log(`Item ${index} - Constructed image URL:`, processedImage);
                 }
             } else {
-                // Use better default image instead of placeholder
+                // Sử dụng hình ảnh mặc định tốt hơn thay vì placeholder
                 processedImage = '/images/product-default.jpg';
                 console.log(`Item ${index} - Using default image:`, processedImage);
             }
@@ -189,7 +191,7 @@ const prepareOrderItems = (items) => {
             console.log(`Item ${index} - Final processed item:`, JSON.stringify(result, null, 2));
             return result;
         } catch (err) {
-            console.error(`Error processing item at index ${index}:`, err);
+            console.error(`Error processing item at index ${index}:`, err); // Ghi log lỗi xử lý item
             return {
                 product: {
                     _id: '',

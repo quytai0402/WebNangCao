@@ -662,19 +662,6 @@ const CommentComponent = () => {
                         <tr key={comment._id}>
                           <td>
                             <div className="d-flex align-items-center">
-                              <div style={{ 
-                                width: '35px', 
-                                height: '35px',
-                                borderRadius: '50%',
-                                backgroundColor: '#f8f9fa',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                marginRight: '10px',
-                                color: '#ff758c'
-                              }}>
-                                <FaUser />
-                              </div>
                               <div>
                                 <div className="fw-medium">{comment.customer?.name || 'Người dùng ẩn danh'}</div>
                                 <div className="d-flex align-items-center">
@@ -843,9 +830,6 @@ const CommentComponent = () => {
             <Card className="original-comment-card mb-3 border-0 bg-light">
               <Card.Body className="p-3">
                 <div className="d-flex mb-2 align-items-center">
-                  <div className="user-avatar me-2">
-                    <FaUser size={14} />
-                  </div>
                   <span className="fw-medium">
                     {selectedComment.customer?.name || 'Người dùng ẩn danh'}
                     {renderUserBadge(selectedComment.customer)}
@@ -896,7 +880,6 @@ const CommentComponent = () => {
               </Button>
             </div>
           </Form>
-          <div className="flower-decoration modal-flower-1">🌸</div>
           <div className="flower-decoration modal-flower-2">🌷</div>
         </Modal.Body>
       </Modal>
@@ -920,11 +903,6 @@ const CommentComponent = () => {
             <Card className="original-comment-card mb-4 border-0">
               <Card.Body className="p-3 bg-light rounded">
                 <div className="d-flex mb-2 align-items-center">
-                  <div className="user-avatar-container me-2">
-                    <div className="user-avatar">
-                      <FaUser />
-                    </div>
-                  </div>
                   <div>
                     <span className="fw-medium">
                       {commentWithReplies.customer?.name || 'Người dùng ẩn danh'}
@@ -968,11 +946,6 @@ const CommentComponent = () => {
                         <Card.Body className="p-3">
                           <div className="d-flex justify-content-between align-items-start">
                             <div className="reply-header d-flex align-items-center">
-                              <div className="user-avatar-container me-2">
-                                <div className="user-avatar reply-avatar">
-                                  <FaUser />
-                                </div>
-                              </div>
                               <div>
                                 <div className="d-flex align-items-center">
                                   <span className="fw-medium">
@@ -1021,11 +994,6 @@ const CommentComponent = () => {
                                   <Card.Body className="py-2 px-3">
                                     <div className="d-flex justify-content-between align-items-start">
                                       <div className="reply-header d-flex align-items-center">
-                                        <div className="user-avatar-container me-2">
-                                          <div className="user-avatar nested-reply-avatar">
-                                            <FaUser size={12} />
-                                          </div>
-                                        </div>
                                         <div>
                                           <div className="d-flex align-items-center">
                                             <span className="fw-medium">

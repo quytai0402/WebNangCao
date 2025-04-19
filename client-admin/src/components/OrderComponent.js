@@ -477,7 +477,7 @@ class Order extends Component {
         } else if (method === 'transfer') {
             return (
                 <Badge bg="primary" className="d-flex align-items-center">
-                    <FaCreditCard className="me-1" /> Chuyển khoản ngân hàng
+                    <FaCreditCard className="me-1" /> Chuyển Khoản NH
                 </Badge>
             );
         }

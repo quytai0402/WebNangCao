@@ -7,7 +7,8 @@ const PORT = process.env.PORT || 3000; // Lấy cổng từ biến môi trườn
 
 // Cấu hình CORS
 app.use(cors({
-    origin: ['http://localhost:3001', 'http://localhost:3000', 'http://localhost:3002'], // Cho phép các nguồn gốc này truy cập vào API
+    origin: ['http://localhost:3001', 'http://localhost:3000', 'http://localhost:3002', 
+             'https://webnangcao-admin.onrender.com', 'https://webnangcao-customer.onrender.com'],
     credentials: true // Cho phép gửi cookie và thông tin xác thực
 }));
 
@@ -16,6 +17,11 @@ app.use(express.json({ limit: '100mb' })); // Thiết lập giới hạn kích t
 app.use(express.urlencoded({ limit: '100mb', extended: true })); // Thiết lập giới hạn kích thước cho dữ liệu URL-encoded
 
 app.use(express.static('public')); // Phục vụ các tệp tĩnh từ thư mục 'public'
+
+// Route mặc định cho health check
+app.get('/', (req, res) => {
+  res.json({ message: 'API is running successfully' });
+});
 
 // Định nghĩa các route API
 const adminApi = require('./api/admin'); // Nhập các route quản trị viên từ file admin

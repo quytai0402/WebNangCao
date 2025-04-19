@@ -1,33 +1,35 @@
-const MongooseUtil = require('../utils/MongooseUtil'); // Nhập thư viện MongooseUtil từ thư mục utils
-const Models = require('./Models'); // Nhập các model từ file Models
-const bcrypt = require('bcrypt'); // Import bcrypt for password hashing
+const MongooseUtil = require('../utils/MongooseUtil'); // Nhập thư viện MongooseUtil để kết nối MongoDB
+const Models = require('./Models'); // Nhập các model dữ liệu từ file Models.js
+const bcrypt = require('bcrypt'); // Nhập thư viện bcrypt để mã hóa mật khẩu
 
 const AdminDAO = {
-    // Đối tượng AdminDAO để quản lý các truy vấn liên quan đến quản trị viên
+    // Đối tượng AdminDAO chứa các phương thức truy vấn liên quan đến quản trị viên (admin)
     async selectByUsernameAndPassword(username, password) {
-        // Hàm bất đồng bộ để chọn quản trị viên theo tên người dùng
-        const admin = await Models.Admin.findOne({ username: username }); // Tìm một quản trị viên trong cơ sở dữ liệu theo username
+        // Phương thức tìm kiếm admin theo tên đăng nhập và mật khẩu
+        // Input: username - tên đăng nhập, password - mật khẩu
+        // Output: đối tượng admin nếu tìm thấy và mật khẩu đúng, null nếu không tìm thấy
+        const admin = await Models.Admin.findOne({ username: username }); // Tìm admin trong database theo username
         
-        // If admin is found, verify password
+        // Nếu tìm thấy admin, tiến hành xác thực mật khẩu
         if (admin) {
-            // For backwards compatibility - check if it's a plain text password
+            // Kiểm tra tương thích ngược - xác thực nếu mật khẩu là văn bản thuần (chưa mã hóa)
             if (admin.password === password) {
-                // Hash the plain text password and update it in the database
-                const salt = await bcrypt.genSalt(10);
-                const hashedPassword = await bcrypt.hash(password, salt);
-                await Models.Admin.updateOne({ _id: admin._id }, { password: hashedPassword });
-                return admin;
+                // Mã hóa mật khẩu văn bản thuần và cập nhật vào cơ sở dữ liệu
+                const salt = await bcrypt.genSalt(10); // Tạo salt để mã hóa
+                const hashedPassword = await bcrypt.hash(password, salt); // Mã hóa mật khẩu
+                await Models.Admin.updateOne({ _id: admin._id }, { password: hashedPassword }); // Cập nhật mật khẩu đã mã hóa
+                return admin; // Trả về thông tin admin
             }
             
-            // Check if the password matches the hashed password
-            const isMatch = await bcrypt.compare(password, admin.password);
+            // Kiểm tra mật khẩu đã nhập có khớp với mật khẩu đã mã hóa trong database
+            const isMatch = await bcrypt.compare(password, admin.password); // So sánh mật khẩu nhập vào với mật khẩu đã mã hóa
             if (isMatch) {
-                return admin;
+                return admin; // Trả về thông tin admin nếu mật khẩu đúng
             }
         }
         
-        return null; // Return null if no match found
+        return null; // Trả về null nếu không tìm thấy admin hoặc mật khẩu không đúng
     }
 };
 
-module.exports = AdminDAO; // Xuất đối tượng AdminDAO để sử dụng ở nơi khác
+module.exports = AdminDAO; // Xuất module AdminDAO để có thể sử dụng trong các file khác

@@ -1,0 +1,63 @@
+services:
+  - type: web
+    name: webnangcao-api
+    env: node
+    buildCommand: cd server && npm install
+    startCommand: cd server && npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: JWT_SECRET
+        fromEnvVar: JWT_SECRET
+      - key: DB_SERVER
+        fromEnvVar: DB_SERVER
+      - key: DB_USER
+        fromEnvVar: DB_USER
+      - key: DB_PASS
+        fromEnvVar: DB_PASS
+      - key: DB_DATABASE
+        fromEnvVar: DB_DATABASE
+      - key: CLOUDINARY_CLOUD_NAME
+        fromEnvVar: CLOUDINARY_CLOUD_NAME
+      - key: CLOUDINARY_API_KEY
+        fromEnvVar: CLOUDINARY_API_KEY
+      - key: CLOUDINARY_API_SECRET
+        fromEnvVar: CLOUDINARY_API_SECRET
+      - key: EMAIL_USER
+        fromEnvVar: EMAIL_USER
+      - key: EMAIL_PASS
+        fromEnvVar: EMAIL_PASS
+      - key: SMTP_HOST
+        fromEnvVar: SMTP_HOST
+      - key: SMTP_PORT
+        fromEnvVar: SMTP_PORT
+      - key: SMTP_USER
+        fromEnvVar: SMTP_USER
+      - key: SMTP_PASS
+        fromEnvVar: SMTP_PASS
+      - key: OPENAI_API_KEY
+        fromEnvVar: OPENAI_API_KEY
+
+  - type: web
+    name: webnangcao-admin
+    env: node
+    buildCommand: cd client-admin && npm install && npm run build
+    startCommand: cd client-admin && npx serve -s build
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: REACT_APP_API_URL
+        value: https://webnangcao-api.onrender.com
+
+  - type: web
+    name: webnangcao-customer
+    env: node
+    buildCommand: cd client-customer && npm install && npm run build
+    startCommand: cd client-customer && npx serve -s build
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: REACT_APP_API_URL
+        value: https://webnangcao-api.onrender.com 

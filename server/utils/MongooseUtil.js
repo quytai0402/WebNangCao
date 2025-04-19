@@ -1,20 +1,20 @@
-const mongoose = require('mongoose');
+const mongoose = require('mongoose'); 
 const { MyConstants } = require('./MyConstants');
 
 const uri = 'mongodb+srv://' + MyConstants.DB_USER + ':' + MyConstants.DB_PASS + '@' + MyConstants.DB_SERVER + '/' + MyConstants.DB_DATABASE;
 
+// Kết nối đến MongoDB sử dụng chuỗi kết nối đã tạo
 mongoose.connect(uri)
     .then(() => { 
-        console.log('Connected to MongoDB at ' + MyConstants.DB_SERVER); 
-        console.log('Database:', MyConstants.DB_DATABASE);
+        console.log('Đã kết nối thành công với MongoDB tại ' + MyConstants.DB_SERVER); 
+        console.log('Cơ sở dữ liệu:', MyConstants.DB_DATABASE); 
     })
     .catch((err) => { 
-        console.error('MongoDB connection error:', err); 
+        console.error('Lỗi kết nối MongoDB:', err); 
     });
 
-// Add connection error handler
 mongoose.connection.on('error', (err) => {
-    console.error('MongoDB connection error:', err);
+    console.error('Lỗi kết nối MongoDB:', err);
 });
 
-module.exports = mongoose;
+module.exports = mongoose; 

@@ -439,49 +439,49 @@ router.post('/orders', JwtUtil.checkToken, async function (req, res) {
     try {
         const { customer, items } = req.body;
 
-        // Validate required fields
+        // Kiểm tra các trường bắt buộc
         if (!customer || !items || !Array.isArray(items) || items.length === 0) {
             return res.json({
                 success: false,
-                message: 'Missing required fields'
+                message: 'Thiếu các trường bắt buộc'
             });
         }
 
-        // Validate items data
+        // Kiểm tra dữ liệu các mặt hàng
         for (const item of items) {
             if (!item.product || !item.quantity || item.quantity < 1) {
                 return res.json({
                     success: false,
-                    message: 'Invalid item information'
+                    message: 'Thông tin mặt hàng không hợp lệ'
                 });
             }
         }
 
-        // Get full product details and calculate total
+        // Lấy thông tin chi tiết sản phẩm đầy đủ và tính tổng
         const populatedItems = await Promise.all(items.map(async (item) => {
             const product = await Models.Product.findById(item.product).lean();
             if (!product) {
-                throw new Error(`Product ${item.product} not found`);
+                throw new Error(`Không tìm thấy sản phẩm ${item.product}`);
             }
             return {
                 product: item.product,
                 quantity: item.quantity,
-                price: product.price // Use actual price from database
+                price: product.price // Sử dụng giá thực tế từ cơ sở dữ liệu
             };
         }));
 
-        // Calculate total based on actual product prices
+        // Tính tổng dựa trên giá sản phẩm thực tế
         const total = populatedItems.reduce((sum, item) => {
             return sum + (item.price * item.quantity);
         }, 0);
 
-        // Process customer
+        // Xử lý thông tin khách hàng
         let orderCustomer;
         if (customer.phone) {
-            // Check for existing customer
+            // Kiểm tra khách hàng đã tồn tại
             orderCustomer = await CustomerDAO.selectByPhone(customer.phone);
             if (!orderCustomer) {
-                // Create new customer if not exists
+                // Tạo khách hàng mới nếu chưa tồn tại
                 orderCustomer = await CustomerDAO.insert({
                     name: customer.name || 'Khách hàng',
                     phone: customer.phone,
@@ -493,12 +493,12 @@ router.post('/orders', JwtUtil.checkToken, async function (req, res) {
                     totalSpent: 0
                 });
             } else {
-                // Increment order count for existing customer
+                // Tăng số lượng đơn hàng cho khách hàng hiện có
                 await CustomerDAO.incrementOrderCount(orderCustomer._id);
             }
         }
 
-        // Create order with calculated total
+        // Tạo đơn hàng với tổng đã tính
         const orderData = {
             customer: {
                 _id: orderCustomer?._id,
@@ -517,15 +517,15 @@ router.post('/orders', JwtUtil.checkToken, async function (req, res) {
 
         res.json({
             success: true,
-            message: 'Order created successfully',
+            message: 'Tạo đơn hàng thành công',
             order: newOrder
         });
 
     } catch (error) {
-        console.error('API error:', error);
+        console.error('Lỗi API:', error);
         res.json({
             success: false,
-            message: error.message || 'Error creating order'
+            message: error.message || 'Lỗi khi tạo đơn hàng'
         });
     }
 });
@@ -541,7 +541,7 @@ router.put('/orders/:id/status', JwtUtil.checkToken, async function (req, res) {
             });
         }
 
-        // Validate status
+        // Xác thực trạng thái
         const validStatuses = ['pending', 'processing', 'shipping', 'delivered', 'cancelled'];
         if (!validStatuses.includes(status)) {
             return res.json({
@@ -550,7 +550,7 @@ router.put('/orders/:id/status', JwtUtil.checkToken, async function (req, res) {
             });
         }
 
-        // Get current order
+        // Lấy đơn hàng hiện tại
         const currentOrder = await OrderDAO.selectById(id);
         if (!currentOrder) {
             return res.json({
@@ -560,15 +560,15 @@ router.put('/orders/:id/status', JwtUtil.checkToken, async function (req, res) {
         }
 
         const oldStatus = currentOrder.status;
-        // Update order status
+        // Cập nhật trạng thái đơn hàng
         const updatedOrder = await OrderDAO.updateStatus(id, status);
 
-        // Send email notification if status changed and customer has email
+        // Gửi email thông báo nếu trạng thái thay đổi và khách hàng có email
         if (oldStatus !== status && updatedOrder.customer && updatedOrder.customer.email) {
             try {
                 console.log(`Gửi email thông báo thay đổi trạng thái đơn hàng #${id} - Phương thức thanh toán: ${updatedOrder.paymentMethod}`);
                 
-                // Fetch full order with product details
+                // Lấy đơn hàng đầy đủ với chi tiết sản phẩm
                 const fullOrder = await Models.Order.findById(id)
                     .populate({
                         path: 'items.product',
@@ -576,13 +576,13 @@ router.put('/orders/:id/status', JwtUtil.checkToken, async function (req, res) {
                     });
                 
                 if (!fullOrder) {
-                    throw new Error('Cannot retrieve full order details');
+                    throw new Error('Không thể lấy thông tin đơn hàng đầy đủ');
                 }
                 
-                // Process order items to ensure complete product information
+                // Xử lý các mặt hàng trong đơn để đảm bảo thông tin sản phẩm đầy đủ
                 const orderItems = await Promise.all(fullOrder.items.map(async (item) => {
                     try {
-                        // Get product ID correctly whether it's a string or object
+                        // Lấy ID sản phẩm chính xác dù nó là chuỗi hoặc đối tượng
                         let productId = null;
                         if (typeof item.product === 'string') {
                             productId = item.product;
@@ -591,17 +591,17 @@ router.put('/orders/:id/status', JwtUtil.checkToken, async function (req, res) {
                         }
                         
                         if (!productId) {
-                            throw new Error('Cannot determine product ID');
+                            throw new Error('Không thể xác định ID sản phẩm');
                         }
                         
-                        // Fetch full product data from database
+                        // Lấy dữ liệu sản phẩm đầy đủ từ cơ sở dữ liệu
                         const product = await Models.Product.findById(productId).lean();
                         
                         if (!product) {
-                            console.log(`Product not found for ID: ${productId}`);
+                            console.log(`Không tìm thấy sản phẩm với ID: ${productId}`);
                             return {
                                 product: {
-                                    _id: productId,
+                                    _id: productId || 'unknown',
                                     name: 'Sản phẩm không còn tồn tại',
                                     image: '/images/product-default.jpg',
                                     price: parseFloat(item.price) || 0
@@ -801,7 +801,7 @@ router.get('/orders/:id/export', JwtUtil.checkToken, async function (req, res) {
         doc.rect(orderInfoX, orderInfoY, boxWidth, 130)
             .fillAndStroke('#f8f9fa', '#e0e0e0');
 
-        // Format date properly - sửa lại cách xử lý ngày tháng
+        // Định dạng ngày tháng đúng cách - sửa lại cách xử lý ngày tháng
         let orderDate = 'N/A';
         try {
             if (order.date) {
@@ -842,8 +842,8 @@ router.get('/orders/:id/export', JwtUtil.checkToken, async function (req, res) {
                 }
             }
         } catch (e) {
-            console.error('Error formatting date:', e);
-            // Fallback: sử dụng ngày hiện tại nếu không thể định dạng
+            console.error('Lỗi khi định dạng ngày tháng:', e);
+            // Dự phòng: sử dụng ngày hiện tại nếu không thể định dạng
             orderDate = new Date().toLocaleDateString('vi-VN', {
                 day: '2-digit',
                 month: '2-digit',
@@ -853,7 +853,7 @@ router.get('/orders/:id/export', JwtUtil.checkToken, async function (req, res) {
             });
         }
 
-        // Format status properly
+        // Định dạng trạng thái đúng cách
         const statusMap = {
             'pending': 'Chờ xử lý',
             'processing': 'Đang xử lý',
@@ -863,7 +863,7 @@ router.get('/orders/:id/export', JwtUtil.checkToken, async function (req, res) {
         };
         const orderStatus = order.status && statusMap[order.status] ? statusMap[order.status] : 'Đang xử lý';
 
-        // Left column - Order details
+        // Cột trái - Thông tin đơn hàng
         doc.fontSize(11)
             .font('Bold')
             .fillColor('#2c3e50')
@@ -877,7 +877,7 @@ router.get('/orders/:id/export', JwtUtil.checkToken, async function (req, res) {
             .moveDown(0.3)
             .text(`Trạng thái: ${orderStatus}`);
 
-        // Right column - Customer info
+        // Cột phải - Thông tin khách hàng
         doc.font('Bold')
             .fontSize(11)
             .text('THÔNG TIN KHÁCH HÀNG:', orderInfoX + boxWidth / 2, orderInfoY + 15)
@@ -890,7 +890,7 @@ router.get('/orders/:id/export', JwtUtil.checkToken, async function (req, res) {
             .moveDown(0.3)
             .text(`Địa chỉ: ${order.customer?.address || 'N/A'}`);
 
-        // Products table
+        // Bảng sản phẩm
         doc.moveDown(2);
         const tableTop = doc.y + 15;
         const tableHeaders = ['STT', 'Sản phẩm', 'Đơn giá', 'Số lượng', 'Thành tiền'];
@@ -983,33 +983,79 @@ router.get('/orders/:id/export', JwtUtil.checkToken, async function (req, res) {
             });
         }
 
-        // Sử dụng tổng tiền từ order nếu có, hoặc tính từ items
+        // Lấy phí vận chuyển từ order nếu có
+        const shippingFee = order.shippingFee && !isNaN(parseFloat(order.shippingFee)) 
+            ? parseFloat(order.shippingFee) 
+            : 0;
+
+        // Tính tổng tiền hàng (subtotal) trước khi cộng phí vận chuyển
+        const subtotal = total;
+
+        // Cộng phí vận chuyển vào tổng tiền
+        total += shippingFee;
+
+        // Sử dụng tổng tiền từ order nếu có, thay vì tính toán
         if (order.total && !isNaN(parseFloat(order.total)) && parseFloat(order.total) > 0) {
             total = parseFloat(order.total);
         }
 
         yPos += 20;
 
+        // Thông tin chi tiết tổng tiền
+        const labelWidth = 130;
+        const valueWidth = 130;
+        const summaryXPos = orderInfoX + tableWidth - labelWidth - valueWidth;
+
+        // Tiền hàng (subtotal)
         doc.font('Bold')
-            .fontSize(12);
-
-        const totalLabelWidth = 80;
-        const totalValueWidth = 120;
-        const totalXPos = orderInfoX + tableWidth - totalLabelWidth - totalValueWidth;
-
-        // Total label
-        doc.fillColor('#2c3e50')
-            .text('Tổng tiền:', totalXPos, yPos, {
-                width: totalLabelWidth,
+            .fontSize(11)
+            .fillColor('#2c3e50')
+            .text('Tổng tiền hàng:', summaryXPos, yPos, {
+                width: labelWidth,
                 align: 'left'
             });
 
-        // Total value
+        doc.font('Regular')
+            .fillColor('#2c3e50')
+            .text(`${subtotal.toLocaleString('vi-VN')} đ`,
+                summaryXPos + labelWidth, yPos, {
+                width: valueWidth,
+                align: 'left'
+            });
+        
+        // Phí vận chuyển
+        yPos += 25;
+        doc.font('Bold')
+            .fillColor('#2c3e50')
+            .text('Phí vận chuyển:', summaryXPos, yPos, {
+                width: labelWidth,
+                align: 'left'
+            });
+
+        doc.font('Regular')
+            .fillColor('#2c3e50')
+            .text(`${shippingFee.toLocaleString('vi-VN')} đ`,
+                summaryXPos + labelWidth, yPos, {
+                width: valueWidth,
+                align: 'left'
+            });
+
+        // Tổng thanh toán
+        yPos += 25;
+        doc.font('Bold')
+            .fontSize(12)
+            .fillColor('#2c3e50')
+            .text('Tổng thanh toán:', summaryXPos, yPos, {
+                width: labelWidth,
+                align: 'left'
+            });
+
+        // Giá trị tổng tiền
         doc.fillColor('#e74c3c')
             .fontSize(14)
             .text(`${total.toLocaleString('vi-VN')} đ`,
-                totalXPos + totalLabelWidth, yPos, {
-                width: totalValueWidth,
+                summaryXPos + labelWidth, yPos, {
+                width: valueWidth,
                 align: 'left'
             });
 
@@ -1064,10 +1110,25 @@ router.get('/customers', JwtUtil.checkToken, async function (req, res) {
         const sortOrder = req.query.sortOrder === 'asc' ? 1 : -1;
         sort[sortField] = sortOrder;
 
-        const [customers, total] = await Promise.all([
+        const [customersData, total] = await Promise.all([
             CustomerDAO.selectByQueryWithPagination(query, sort, skip, limit),
             CustomerDAO.count(query)
         ]);
+        
+        // Xử lý các khách hàng để đánh dấu khách vãng lai
+        const customers = customersData.map(customer => {
+            // Đảm bảo rằng isRegistered được đặt chính xác
+            // Ưu tiên sử dụng giá trị isRegistered từ DB, chỉ sử dụng username là backup
+            const isRegistered = customer.isRegistered !== undefined ? customer.isRegistered : !!customer.username;
+            
+            return {
+                ...customer,
+                isRegistered: isRegistered,
+                type: isRegistered ? 'registered' : 'guest',
+                // Thêm trường label để hiển thị trên frontend
+                label: isRegistered ? 'Đã đăng ký' : 'Khách vãng lai'
+            };
+        });
 
         res.json({
             success: true,
@@ -1352,54 +1413,65 @@ router.put('/customers/:id/password', JwtUtil.checkToken, async function (req, r
 });
 router.get('/customers/:id/orders', JwtUtil.checkToken, async function (req, res) {
     try {
-        const { id } = req.params;
+        const customerId = req.params.id;
 
-        if (!id) {
-            return res.json({
+        // Kiểm tra ID có hợp lệ không
+        if (!customerId || customerId === 'undefined') {
+            return res.status(400).json({
                 success: false,
                 message: 'ID khách hàng không hợp lệ'
             });
         }
 
-        // Tìm thông tin khách hàng
-        const customer = await CustomerDAO.selectById(id);
+        // Lấy thông tin khách hàng
+        const customer = await CustomerDAO.selectById(customerId);
         if (!customer) {
-            return res.json({
+            return res.status(404).json({
                 success: false,
                 message: 'Không tìm thấy khách hàng'
             });
         }
 
-        console.log(`Found customer: ${customer.name}, email: ${customer.email}, phone: ${customer.phone}`);
-
-        // Tạo query tìm kiếm đơn hàng theo nhiều điều kiện
-        const orders = await Models.Order.find({
+        // Tạo các điều kiện tìm kiếm đơn hàng
+        const query = {
             $or: [
-                { 'customer._id': id.toString() },
-                { 'customer._id': id },
-                // Thêm điều kiện tìm theo phone để tìm được các đơn hàng của khách vãng lai
+                { 'customer._id': customerId.toString() },
                 { 'customer.phone': customer.phone }
             ]
-        }).sort({ date: -1 });
+        };
 
-        console.log(`Found total ${orders.length} orders for customer ${customer.name} (ID: ${id})`);
+        // Thêm điều kiện tìm kiếm theo email nếu khách hàng có email
+        if (customer.email) {
+            query.$or.push({ 'customer.email': customer.email });
+        }
+
+        // Tìm các đơn hàng khớp với điều kiện
+        const orders = await Models.Order.find(query)
+            .sort({ date: -1 })
+            .lean();
+
+        // Thêm thông tin khách hàng vào kết quả
+        const customerInfo = {
+            _id: customer._id,
+            name: customer.name,
+            phone: customer.phone,
+            email: customer.email,
+            isRegistered: !!customer.username,
+            type: customer.username ? 'registered' : 'guest',
+            label: customer.username ? 'Đã đăng ký' : 'Khách vãng lai',
+            status: customer.status
+        };
 
         return res.json({
             success: true,
-            orders: orders.map(order => ({
-                _id: order._id.toString(),
-                customer: order.customer,
-                items: order.items || [],
-                status: order.status || 'pending',
-                date: order.date || new Date(),
-                total: order.total || 0
-            }))
+            orders: orders,
+            customer: customerInfo
         });
     } catch (error) {
-        console.error('Error getting customer orders:', error);
-        return res.json({
+        console.error('Lỗi khi lấy đơn hàng của khách hàng:', error);
+        return res.status(500).json({
             success: false,
-            message: error.message || 'Lỗi khi lấy đơn hàng của khách hàng'
+            message: error.message || 'Lỗi server khi lấy đơn hàng'
         });
     }
 });
@@ -1467,14 +1539,14 @@ router.post('/orders/:id/send-status-notification', JwtUtil.checkToken, async fu
                 }
                 
                 if (!productId) {
-                    throw new Error('Cannot determine product ID');
+                    throw new Error('Không thể xác định ID sản phẩm');
                 }
 
                 // Lấy thông tin sản phẩm từ database
                 const product = await Models.Product.findById(productId).lean();
                 
                 if (!product) {
-                    console.log(`Product not found for ID: ${productId}`);
+                    console.log(`Không tìm thấy sản phẩm với ID: ${productId}`);
                     return {
                         product: {
                             _id: productId || 'unknown',
@@ -1623,7 +1695,7 @@ router.post('/orders/:id/send-status-notification', JwtUtil.checkToken, async fu
                   };
                 }
                 
-                // If not found, return a placeholder or the existing item
+                // Nếu không tìm thấy, trả về một mục giữ chỗ hoặc mục hiện có
                 if (typeof item.product === 'object' && item.product) {
                   const apiUrl = process.env.API_URL || 'http://localhost:8000';
                   let imageUrl = '/images/product-default.jpg';
@@ -2036,6 +2108,7 @@ router.get('/statistics/export', JwtUtil.checkToken, async function (req, res) {
 
         doc.end();
         
+        // Hàm định dạng tiền tệ
         function formatCurrency(amount) {
             return new Intl.NumberFormat('vi-VN', {
                 style: 'currency',
@@ -2044,49 +2117,50 @@ router.get('/statistics/export', JwtUtil.checkToken, async function (req, res) {
             }).format(amount);
         }
         
+        // Hàm vẽ bảng
         function drawTable(doc, data, columnWidths, hasHeader = false) {
             const tableTop = doc.y;
             let tableBottom = tableTop;
             
-            // Determine row heights first
+            // Xác định chiều cao hàng trước
             const rowHeights = data.map(rowData => {
-                let maxHeight = 20; // minimum row height
+                let maxHeight = 20; // chiều cao hàng tối thiểu
                 rowData.forEach((cellData, i) => {
                     const cellWidth = columnWidths[i];
                     const cellHeight = doc.heightOfString(cellData, {
-                        width: cellWidth - 10, // padding
+                        width: cellWidth - 10, // đệm
                         align: 'left'
                     });
-                    maxHeight = Math.max(maxHeight, cellHeight + 10); // padding
+                    maxHeight = Math.max(maxHeight, cellHeight + 10); // đệm
                 });
                 return maxHeight;
             });
             
-            // Draw rows
+            // Vẽ các hàng
             let yPos = tableTop;
             
             data.forEach((rowData, rowIndex) => {
                 const rowHeight = rowHeights[rowIndex];
-                let xPos = 40; // left margin
+                let xPos = 40; // lề trái
                 
-                // Draw row background for header
+                // Vẽ nền hàng cho phần header
                 if (hasHeader && rowIndex === 0) {
                     doc.fillColor('#f2f2f2')
                        .rect(xPos, yPos, doc.page.width - 80, rowHeight)
                        .fill();
                 }
                 
-                // Draw cell borders and text
+                // Vẽ viền ô và văn bản
                 rowData.forEach((cellData, colIndex) => {
                     const cellWidth = columnWidths[colIndex];
                     
-                    // Draw border
+                    // Vẽ viền
                     doc.strokeColor('#cccccc')
                        .lineWidth(1)
                        .rect(xPos, yPos, cellWidth, rowHeight)
                        .stroke();
                     
-                    // Draw text
+                    // Vẽ văn bản
                     doc.fillColor(hasHeader && rowIndex === 0 ? '#000000' : '#333333')
                        .font(hasHeader && rowIndex === 0 ? 'Bold' : 'Regular')
                        .fontSize(hasHeader && rowIndex === 0 ? 11 : 10)
@@ -2144,7 +2218,7 @@ router.get('/products/:id', JwtUtil.checkToken, async function (req, res) {
             product: product
         });
     } catch (error) {
-        console.error('Error fetching product:', error);
+        console.error('Lỗi khi lấy thông tin sản phẩm:', error);
         res.json({
             success: false,
             message: error.message
@@ -2160,12 +2234,12 @@ router.get('/comments', JwtUtil.checkToken, async (req, res) => {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 20;
     
-    console.log('Admin API - Fetching comments page:', page, 'limit:', limit);
-    console.log('User from token:', req.jwtDecoded);
+    console.log('Admin API - Đang lấy bình luận trang:', page, 'giới hạn:', limit);
+    console.log('Người dùng từ token:', req.jwtDecoded);
     
     try {
       const result = await CommentDAO.getAllComments(page, limit);
-      console.log('Comments fetched successfully, count:', result.comments.length);
+      console.log('Lấy bình luận thành công, số lượng:', result.comments.length);
       
       return res.json({
         success: true,
@@ -2490,14 +2564,14 @@ router.post('/orders/:id/send-confirmation', JwtUtil.checkToken, async function 
                 }
                 
                 if (!productId) {
-                    throw new Error('Cannot determine product ID');
+                    throw new Error('Không thể xác định ID sản phẩm');
                 }
 
                 // Lấy thông tin sản phẩm từ database
                 const product = await Models.Product.findById(productId).lean();
                 
                 if (!product) {
-                    console.log(`Product not found for ID: ${productId}`);
+                    console.log(`Không tìm thấy sản phẩm với ID: ${productId}`);
                     return {
                         product: {
                             _id: productId || 'unknown',

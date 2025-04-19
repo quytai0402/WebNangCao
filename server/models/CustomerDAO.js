@@ -146,7 +146,9 @@ class CustomerDAO {
             // Phân biệt khách vãng lai và khách đã đăng ký
             let newCustomer = {
                 ...customer,
-                isRegistered: !!customer.username // Kiểm tra xem khách hàng này có username hay không
+                // Nếu isRegistered được truyền vào, sử dụng nó
+                // Nếu không, xác định dựa vào việc có username hay không
+                isRegistered: customer.isRegistered !== undefined ? customer.isRegistered : !!customer.username
             };
 
             // Nếu là khách vãng lai, không yêu cầu username và password
@@ -219,12 +221,20 @@ class CustomerDAO {
     // Lấy danh sách khách hàng theo query và phân trang
     static async selectByQueryWithPagination(query, sort, skip, limit) {
         try {
-            return await Models.Customer
+            const result = await Models.Customer
                 .find(query) // Tìm khách hàng theo truy vấn
                 .sort(sort) // Sắp xếp theo điều kiện
                 .skip(skip) // Bỏ qua số lượng bản ghi đầu tiên
                 .limit(limit) // Giới hạn số lượng bản ghi trả về
+                .select('name username email phone status active isRegistered totalOrders totalSpent joinDate') // Chỉ chọn các trường cần thiết
                 .lean(); // Chuyển đổi sang đối tượng đơn giản
+
+            // Đảm bảo rằng tất cả khách hàng có trường isRegistered chính xác
+            return result.map(customer => ({
+                ...customer,
+                // Giữ nguyên giá trị isRegistered từ DB, chỉ sử dụng username làm backup khi isRegistered không tồn tại
+                isRegistered: customer.isRegistered !== undefined ? customer.isRegistered : !!customer.username
+            }));
         } catch (error) {
             throw error; // Ném lỗi
         }

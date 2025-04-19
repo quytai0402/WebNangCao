@@ -278,33 +278,56 @@ router.post('/register', async function (req, res) {
 
     // Kiểm tra số điện thoại đã tồn tại
     const existingPhone = await CustomerDAO.selectByPhone(phone);
-    if (existingPhone) {
+    
+    // Tạo token kích hoạt
+    const activationToken = crypto.randomBytes(20).toString('hex');
+    const activationExpires = Date.now() + 24 * 60 * 60 * 1000; // 24h
+    const hashedPassword = CustomerDAO.hashPassword(password); // Mã hóa mật khẩu
+    
+    let customer;
+
+    // Nếu số điện thoại đã tồn tại và là khách vãng lai, cập nhật thành tài khoản đăng ký
+    if (existingPhone && existingPhone.isRegistered === false) {
+      // Cập nhật thông tin khách hàng vãng lai thành tài khoản đăng ký
+      const updateData = {
+        username,
+        password: hashedPassword,
+        name,
+        email,
+        status: 'inactive',
+        active: false,
+        activationToken,
+        activationExpires,
+        isRegistered: true
+      };
+      
+      customer = await CustomerDAO.update(existingPhone._id, updateData);
+    } 
+    // Nếu số điện thoại đã tồn tại và đã đăng ký, trả về lỗi
+    else if (existingPhone && existingPhone.isRegistered === true) {
       return res.json({
         success: false,
         message: 'Số điện thoại đã được sử dụng'
       });
     }
+    // Nếu số điện thoại chưa tồn tại, tạo khách hàng mới
+    else {
+      // Tạo khách hàng mới
+      const newCustomer = {
+        username,
+        password: hashedPassword,
+        name,
+        phone,
+        email,
+        status: 'inactive',
+        active: false,
+        activationToken,
+        activationExpires,
+        isRegistered: true
+      };
 
-    // Tạo token kích hoạt
-    const activationToken = crypto.randomBytes(20).toString('hex');
-    const activationExpires = Date.now() + 24 * 60 * 60 * 1000; // 24h
-    const hashedPassword = CustomerDAO.hashPassword(password); // Mã hóa mật khẩu
-
-    // Tạo khách hàng mới
-    const newCustomer = {
-      username,
-      password: hashedPassword,
-      name,
-      phone,
-      email,
-      status: 'inactive',
-      active: false,
-      activationToken,
-      activationExpires,
-      isRegistered: true
-    };
-
-    const customer = await CustomerDAO.insert(newCustomer); // Thêm khách hàng vào DB
+      customer = await CustomerDAO.insert(newCustomer); // Thêm khách hàng vào DB
+    }
 
     // Gửi email kích hoạt
     const clientBaseUrl = process.env.CLIENT_URL || 'http://localhost:3001';
@@ -493,6 +516,59 @@ router.post('/checkout', async function (req, res) {
       }
     }
 
+    // Xử lý thông tin khách hàng
+    let customerInfo = { ...customer };
+    let customerId = customer._id;
+    
+    // Kiểm tra xem khách hàng đã đăng nhập hay là khách vãng lai
+    const isRegistered = !!customer.username;
+    
+    // Nếu khách vãng lai, kiểm tra xem đã có trong DB chưa hoặc tạo mới
+    if (!isRegistered) {
+      try {
+        // Tìm khách hàng theo số điện thoại
+        let existingCustomer = null;
+        if (customer.phone) {
+          existingCustomer = await CustomerDAO.findByPhone(customer.phone);
+        }
+        
+        // Nếu không tìm thấy bằng số điện thoại, thử tìm bằng email
+        if (!existingCustomer && customer.email) {
+          existingCustomer = await CustomerDAO.selectByEmail(customer.email);
+        }
+        
+        // Nếu tìm thấy, sử dụng thông tin khách hàng đã có
+        if (existingCustomer) {
+          console.log(`Đã tìm thấy khách hàng: ${existingCustomer._id}`);
+          customerId = existingCustomer._id;
+          // Cập nhật thông tin mới nhất nếu cần
+          await CustomerDAO.update(existingCustomer._id, {
+            name: customer.name || existingCustomer.name,
+            email: customer.email || existingCustomer.email,
+            address: customer.address || existingCustomer.address,
+            // Đảm bảo rằng khách hàng giữ nguyên giá trị isRegistered hiện tại của họ
+            isRegistered: existingCustomer.isRegistered
+          });
+        } else {
+          // Tạo khách hàng mới (khách vãng lai)
+          console.log('Tạo khách hàng mới (khách vãng lai)');
+          const newCustomer = await CustomerDAO.insert({
+            name: customer.name,
+            phone: customer.phone,
+            email: customer.email,
+            address: customer.address,
+            isRegistered: false, // Đảm bảo khách vãng lai có isRegistered = false
+            status: 'active',
+            active: true
+          });
+          customerId = newCustomer._id;
+        }
+      } catch (error) {
+        console.error('Lỗi khi xử lý thông tin khách hàng:', error);
+        // Tiếp tục xử lý đơn hàng dù có lỗi khi lưu thông tin khách hàng
+      }
+    }
+
     // Lấy chi tiết sản phẩm cho mỗi mặt hàng
     const itemsWithDetails = await Promise.all(items.map(async (item) => {
       try {
@@ -538,13 +614,13 @@ router.post('/checkout', async function (req, res) {
     // Tiếp tục với việc tạo đơn hàng
     const newOrderData = {
       customer: {
-        _id: customer._id,
+        _id: customerId,
         name: customer.name,
         phone: customer.phone,
         email: customer.email,
         address: customer.address,
-        isRegistered: true,
-        type: 'registered'
+        isRegistered: isRegistered,
+        type: isRegistered ? 'registered' : 'guest'
       },
       items: itemsWithDetails,
       subtotal: subtotal,

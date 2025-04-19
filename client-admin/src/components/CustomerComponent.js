@@ -609,7 +609,7 @@ class Customer extends Component {
         } else if (method === 'transfer') {
             return (
                 <Badge bg="primary" className="d-flex align-items-center">
-                    <FaCreditCard className="me-1" /> Chuyển khoản ngân hàng
+                    <FaCreditCard className="me-1" /> Chuyển Khoản NH
                 </Badge>
             );
         }
@@ -808,10 +808,14 @@ class Customer extends Component {
                                                     </td>
                                                     <td>{customer.username || 'Chưa đăng ký'}</td>
                                                     <td>
-                                                        {customer.username ? (
-                                                            <Badge bg="success">Đã đăng ký</Badge>
+                                                        {customer.label ? (
+                                                            <Badge bg={customer.isRegistered ? "success" : "warning"} text={customer.isRegistered ? "white" : "dark"}>
+                                                                {customer.label}
+                                                            </Badge>
+                                                        ) : customer.isRegistered ? (
+                                                            <Badge bg="success" className="ms-2">Đã đăng ký</Badge>
                                                         ) : (
-                                                            <Badge bg="warning" text="dark">Khách vãng lai</Badge>
+                                                            <Badge bg="warning" text="dark" className="ms-2">Khách vãng lai</Badge>
                                                         )}
                                                     </td>
                                                     <td>
@@ -942,7 +946,7 @@ class Customer extends Component {
                                                         <Badge className={`status-badge-lg ${selectedCustomer.status}`}>
                                                             {selectedCustomer.status === 'active' ? 'Kích hoạt' : 'Vô hiệu'}
                                                         </Badge>
-                                                        {selectedCustomer.username ? (
+                                                        {selectedCustomer.isRegistered ? (
                                                             <Badge bg="success" className="ms-2">Đã đăng ký</Badge>
                                                         ) : (
                                                             <Badge bg="warning" text="dark" className="ms-2">Khách vãng lai</Badge>

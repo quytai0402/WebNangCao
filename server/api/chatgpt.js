@@ -1,9 +1,10 @@
-const express = require('express');
-const router = express.Router();
-const OpenAI = require('openai');
-require('dotenv').config();
-const CategoryDAO = require('../models/CategoryDAO');
-const ProductDAO = require('../models/ProductDAO');
+// Nhập các module cần thiết
+const express = require('express'); // Nhập thư viện Express để tạo API endpoints
+const router = express.Router(); // Tạo router để định nghĩa các route
+const OpenAI = require('openai'); // Nhập thư viện OpenAI để tương tác với ChatGPT
+require('dotenv').config(); // Tải các biến môi trường từ file .env
+const CategoryDAO = require('../models/CategoryDAO'); // Nhập DAO để tương tác với dữ liệu danh mục
+const ProductDAO = require('../models/ProductDAO'); // Nhập DAO để tương tác với dữ liệu sản phẩm
 
 // Thông tin về website để giúp ChatGPT xác định câu trả lời phù hợp
 const websiteInfo = `
@@ -58,15 +59,16 @@ try {
     openai = new OpenAI({
       apiKey: process.env.OPENAI_API_KEY,
     });
-    console.log('OpenAI initialized successfully');
+    console.log('OpenAI initialized successfully'); // Ghi log khi OpenAI được khởi tạo thành công
   } else {
-    console.error('Invalid OpenAI API key format. API key should start with "sk-"');
+    console.error('Invalid OpenAI API key format. API key should start with "sk-"'); // Ghi log lỗi khi API key không hợp lệ
   }
 } catch (error) {
-  console.error('Error initializing OpenAI:', error);
+  console.error('Error initializing OpenAI:', error); // Ghi log lỗi khi có lỗi xảy ra trong quá trình khởi tạo
 }
 
-// Các câu trả lời dự phòng cho một số câu hỏi phổ biến
+// Các câu trả lời dự phòng cho một số câu hỏi phổ biến 
+// Được sử dụng khi không có kết nối đến OpenAI hoặc khi có vấn đề với API
 const fallbackResponses = {
   'shipping': 'Chúng tôi cung cấp giao hàng miễn phí trong nội thành cho đơn hàng trên 500.000đ. Phí vận chuyển từ 30.000đ đến 50.000đ tùy khu vực. Thời gian giao hàng chỉ 2 giờ trong nội thành và 4-24 giờ cho các tỉnh. Chúng tôi còn có dịch vụ giao gấp trong vòng 60 phút với phụ phí.',
   
@@ -104,74 +106,91 @@ const fallbackResponses = {
 };
 
 // Hàm tìm câu trả lời dự phòng dựa trên từ khóa trong câu hỏi
+// Được sử dụng để trả về câu trả lời phù hợp khi không thể sử dụng OpenAI API
 const findFallbackResponse = (message) => {
-  const messageLower = message.toLowerCase();
+  const messageLower = message.toLowerCase(); // Chuyển đổi tin nhắn thành chữ thường để dễ dàng so sánh
   
+  // Kiểm tra từ khóa liên quan đến giao hàng/vận chuyển
   if (messageLower.includes('giao hàng') || messageLower.includes('vận chuyển') || messageLower.includes('shipping') || messageLower.includes('giao nhanh') || messageLower.includes('phí ship')) {
     return fallbackResponses.shipping;
   }
   
+  // Kiểm tra từ khóa liên quan đến thanh toán
   if (messageLower.includes('thanh toán') || messageLower.includes('payment') || messageLower.includes('trả tiền') || messageLower.includes('chuyển khoản') || messageLower.includes('thẻ tín dụng') || messageLower.includes('cod')) {
     return fallbackResponses.payment;
   }
   
+  // Kiểm tra từ khóa liên quan đến chính sách đổi trả
   if (messageLower.includes('đổi trả') || messageLower.includes('hoàn tiền') || messageLower.includes('return') || messageLower.includes('hoa héo') || messageLower.includes('không tươi') || messageLower.includes('hư hỏng')) {
     return fallbackResponses.return;
   }
   
+  // Kiểm tra từ khóa liên quan đến khuyến mãi/giảm giá
   if (messageLower.includes('giảm giá') || messageLower.includes('khuyến mãi') || messageLower.includes('discount') || messageLower.includes('sale') || messageLower.includes('ưu đãi') || messageLower.includes('voucher') || messageLower.includes('mã giảm giá')) {
     return fallbackResponses.discount;
   }
   
+  // Kiểm tra từ khóa liên quan đến thông tin liên hệ
   if (messageLower.includes('liên hệ') || messageLower.includes('hotline') || messageLower.includes('email') || messageLower.includes('địa chỉ') || messageLower.includes('cửa hàng') || messageLower.includes('shop') || messageLower.includes('thông tin')) {
     return fallbackResponses.contact;
   }
   
+  // Kiểm tra từ khóa liên quan đến hoa hồng
   if (messageLower.includes('hoa hồng') || messageLower.includes('rose') || messageLower.includes('roses')) {
     return fallbackResponses.roses;
   }
   
+  // Kiểm tra từ khóa liên quan đến hoa ly
   if (messageLower.includes('hoa ly') || messageLower.includes('lily') || messageLower.includes('lilies')) {
     return fallbackResponses.lilies;
   }
   
+  // Kiểm tra từ khóa liên quan đến hoa lan
   if (messageLower.includes('hoa lan') || messageLower.includes('lan hồ điệp') || messageLower.includes('orchid')) {
     return fallbackResponses.orchids;
   }
   
+  // Kiểm tra từ khóa liên quan đến hoa sinh nhật
   if (messageLower.includes('sinh nhật') || messageLower.includes('birthday') || messageLower.includes('mừng tuổi')) {
     return fallbackResponses.birthday;
   }
   
+  // Kiểm tra từ khóa liên quan đến hoa cưới
   if (messageLower.includes('cưới') || messageLower.includes('đám cưới') || messageLower.includes('wedding') || messageLower.includes('kết hôn') || messageLower.includes('cô dâu') || messageLower.includes('chú rể')) {
     return fallbackResponses.wedding;
   }
   
+  // Kiểm tra từ khóa liên quan đến hoa chúc mừng
   if (messageLower.includes('chúc mừng') || messageLower.includes('khai trương') || messageLower.includes('tốt nghiệp') || messageLower.includes('congratulation') || messageLower.includes('thăng chức')) {
     return fallbackResponses.congratulation;
   }
   
+  // Kiểm tra từ khóa liên quan đến hoa chia buồn
   if (messageLower.includes('chia buồn') || messageLower.includes('đám tang') || messageLower.includes('viếng') || messageLower.includes('condolence') || messageLower.includes('vòng hoa')) {
     return fallbackResponses.condolence;
   }
   
+  // Kiểm tra từ khóa liên quan đến việc bảo quản hoa
   if (messageLower.includes('giữ tươi') || messageLower.includes('bảo quản') || messageLower.includes('tươi lâu') || messageLower.includes('preservation') || messageLower.includes('cách giữ')) {
     return fallbackResponses.preservation;
   }
   
+  // Kiểm tra từ khóa liên quan đến dịch vụ tùy chỉnh
   if (messageLower.includes('đặt hàng') || messageLower.includes('yêu cầu riêng') || messageLower.includes('customize') || messageLower.includes('thiết kế') || messageLower.includes('theo yêu cầu')) {
     return fallbackResponses.custom;
   }
   
+  // Kiểm tra từ khóa liên quan đến dịch vụ trang trí sự kiện
   if (messageLower.includes('sự kiện') || messageLower.includes('trang trí') || messageLower.includes('event') || messageLower.includes('tiệc') || messageLower.includes('party') || messageLower.includes('decor')) {
     return fallbackResponses.event;
   }
   
+  // Kiểm tra từ khóa liên quan đến độ tươi của hoa
   if (messageLower.includes('hoa tươi') || messageLower.includes('tươi không') || messageLower.includes('fresh') || messageLower.includes('độ tươi')) {
     return fallbackResponses.freshness;
   }
   
-  // Xử lý các câu hỏi về danh mục sản phẩm/hoa
+  // Kiểm tra từ khóa liên quan đến danh mục sản phẩm/hoa
   if (messageLower.includes('sản phẩm') || 
       messageLower.includes('hàng') || 
       messageLower.includes('product') || 
@@ -195,18 +214,26 @@ const findFallbackResponse = (message) => {
 };
 
 // Hàm kiểm tra xem câu hỏi có liên quan đến website không
+// Trả về true nếu câu hỏi liên quan, và false nếu không liên quan
 const isRelevantQuestion = (message) => {
   const messageLower = message.toLowerCase();
   const irrelevantKeywords = [
-    'chính trị', 'thể thao', 'thời tiết', 'covid', 'dịch bệnh', 'tình hình thế giới',
-    'tin tức', 'bóng đá', 'giải trí', 'điện ảnh', 'tỷ giá', 'chứng khoán', 'bitcoin',
-    'game', 'chơi game', 'tài khoản', 'mật khẩu', 'hack', 'crack'
+    // Các từ khóa không liên quan đến website
+    'chính trị', 'bầu cử', 'đảng', 'quân sự', 'chiến tranh',
+    'thời tiết', 'dự báo', 'mưa', 'bão', 'áp thấp',
+    'chứng khoán', 'cổ phiếu', 'bitcoin', 'crypto', 'tiền ảo',
+    'tôn giáo', 'đạo phật', 'đạo chúa', 'nhà thờ', 'giáo hội',
+    'scandal', 'drama', 'showbiz', 'cầu thủ', 'diễn viên'
   ];
   
-  // Kiểm tra từ khóa không liên quan
+  // Kiểm tra các từ khóa không liên quan
   for (const keyword of irrelevantKeywords) {
-    if (messageLower.includes(keyword)) {
-      return false;
+    if (messageLower.includes(keyword) && 
+        !messageLower.includes('hoa') && 
+        !messageLower.includes('cửa hàng') && 
+        !messageLower.includes('shop') && 
+        !messageLower.includes('giao')) {
+      return false; // Trả về false nếu có chứa từ khóa không liên quan
     }
   }
   
@@ -255,9 +282,10 @@ const isRelevantQuestion = (message) => {
     'workshop', 'dạy cắm hoa', 'lớp học', 'tư vấn'
   ];
   
+  // Kiểm tra nếu có từ khóa liên quan
   for (const keyword of relevantKeywords) {
     if (messageLower.includes(keyword)) {
-      return true;
+      return true; // Trả về true nếu có từ khóa liên quan
     }
   }
   
@@ -265,11 +293,13 @@ const isRelevantQuestion = (message) => {
   return true;
 };
 
-// API endpoint xử lý các yêu cầu chat
+// API endpoint xử lý các yêu cầu chat từ người dùng
+// POST /api/chatgpt/chat
 router.post('/chat', async (req, res) => {
   try {
-    const { message } = req.body;
+    const { message } = req.body; // Lấy nội dung tin nhắn từ request body
     
+    // Kiểm tra nếu thiếu nội dung tin nhắn
     if (!message) {
       return res.status(400).json({ 
         success: false, 
@@ -346,6 +376,7 @@ LIÊN HỆ:
       'danh mục'
     ];
     
+    // Trả về danh mục hoa từ cơ sở dữ liệu nếu có yêu cầu
     if (flowerCategoryKeywords.some(keyword => message.toLowerCase().includes(keyword))) {
       try {
         // Lấy danh mục hoa từ database
@@ -391,11 +422,12 @@ LIÊN HỆ:
 
     // Sử dụng OpenAI API nếu khả dụng
     try {
+      // Gọi API ChatGPT để lấy phản hồi
       const completion = await openai.chat.completions.create({
-        model: "gpt-3.5-turbo",
+        model: "gpt-3.5-turbo", // Sử dụng model gpt-3.5-turbo
         messages: [
           { 
-            role: "system", 
+            role: "system", // Tin nhắn hệ thống để định hướng AI
             content: `Bạn là trợ lý AI cho website thương mại điện tử này. Dưới đây là thông tin chi tiết về website:
             
             ${websiteInfo}
