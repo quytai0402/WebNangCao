@@ -189,10 +189,17 @@ class Login extends Component {
   async apiLogin(account) {
     try {
       console.log('Logging in with account:', account.username);
+      console.log('API URL from context:', this.context.apiUrl);
       const apiUrl = `${this.context.apiUrl}/admin/login`;
       console.log('Using API URL:', apiUrl);
       
-      const res = await axios.post(apiUrl, account);
+      // Add CORS headers for debugging
+      const res = await axios.post(apiUrl, account, {
+        withCredentials: true,
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
       const result = res.data;
       
       console.log('Login response:', result);
