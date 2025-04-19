@@ -20,4 +20,6 @@ function withRouter(Component) {
   return ComponentWithRouterProp;
 }
 
+// Export both default and named export to support both import syntaxes
+export { withRouter };
 export default withRouter;
