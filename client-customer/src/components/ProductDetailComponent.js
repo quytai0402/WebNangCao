@@ -210,11 +210,21 @@ class ProductDetail extends Component {
             // Save to localStorage
             localStorage.setItem('buyNowItems', JSON.stringify(buyNowItems));
             
-            // Use React Router for navigation instead of direct URL change
-            this.props.navigate('/checkout');
+            // Use state property in navigation to ensure the checkout component knows
+            // this is a direct buy action even if the page refreshes on Render
+            this.props.navigate('/checkout', { 
+                state: { 
+                    buyNow: true, 
+                    timestamp: new Date().getTime() 
+                }
+            });
+            
+            // Fallback approach - add a query parameter to the URL as well
+            // This helps with direct URL access situations
+            // window.history.replaceState(null, '', '/checkout?action=buynow&t=' + new Date().getTime());
         } catch (error) {
             console.error('Buy now error:', error);
-            toast.error('Có lỗi xảy ra khi xử lý đơn hàng');
+            toast.error('Có lỗi xảy ra khi mua ngay sản phẩm');
         }
     }
 

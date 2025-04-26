@@ -116,11 +116,21 @@ class ProductSearch extends Component {
             // Save to localStorage
             localStorage.setItem('buyNowItems', JSON.stringify(buyNowItems));
             
-            // Use React Router's navigate for smoother navigation
-            this.props.navigate('/checkout');
+            // Add query parameter to indicate this is a buy now action
+            const searchParams = new URLSearchParams();
+            searchParams.append('action', 'buynow');
+            searchParams.append('t', new Date().getTime());
+            
+            // Use React Router's navigate with state for better reliability
+            this.props.navigate('/checkout', { 
+                state: { 
+                    buyNow: true, 
+                    timestamp: new Date().getTime() 
+                }
+            });
         } catch (error) {
             console.error('Buy now error:', error);
-            toast.error('Có lỗi xảy ra khi xử lý đơn hàng');
+            toast.error('Có lỗi xảy ra khi mua ngay sản phẩm');
         }
     };
 

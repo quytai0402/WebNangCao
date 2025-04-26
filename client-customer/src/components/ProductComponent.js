@@ -127,8 +127,13 @@ class ProductComponent extends React.Component {
             // Save to localStorage
             localStorage.setItem('buyNowItems', JSON.stringify(buyNowItems));
             
-            // Use React Router for navigation
-            this.props.navigate('/checkout');
+            // Use React Router's navigate with state to make it more reliable
+            this.props.navigate('/checkout', { 
+                state: { 
+                    buyNow: true, 
+                    timestamp: new Date().getTime() 
+                }
+            });
         } catch (error) {
             console.error('Buy now error:', error);
             toast.error('Có lỗi xảy ra khi mua ngay sản phẩm');

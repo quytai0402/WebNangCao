@@ -109,9 +109,14 @@ class CheckoutComponent extends Component {
 
   componentDidMount() {
     // Kiểm tra nguồn chuyển hướng đến trang checkout
-    const fromCart = this.props.location?.state?.fromCart ||
+    // Sử dụng cả location state và URL parameters
+    const locationState = this.props.location?.state || {};
+    const fromCart = locationState.fromCart || 
       (new URLSearchParams(window.location.search).get('from') === 'cart') ||
       localStorage.getItem('checkoutFromCart') === 'true';
+    
+    const isBuyNow = locationState.buyNow || 
+      (new URLSearchParams(window.location.search).get('action') === 'buynow');
 
     // Kiểm tra xem có sản phẩm mua ngay không
     const buyNowItems = localStorage.getItem('buyNowItems');
@@ -124,18 +129,24 @@ class CheckoutComponent extends Component {
       
       const cart = localStorage.getItem('cart');
       if (cart) {
-        const cartItems = JSON.parse(cart);
-        this.setState({
-          items: cartItems,
-          totalQuantity: this.calculateTotalQuantity(cartItems),
-          totalAmount: this.calculateTotalAmount(cartItems),
-          isBuyNow: false
-        });
+        try {
+          const cartItems = JSON.parse(cart);
+          this.setState({
+            items: cartItems,
+            totalQuantity: this.calculateTotalQuantity(cartItems),
+            totalAmount: this.calculateTotalAmount(cartItems),
+            isBuyNow: false
+          });
+        } catch (err) {
+          console.error('Error parsing cart:', err);
+          this.setState({ items: [], totalQuantity: 0, totalAmount: 0 });
+        }
       }
       // Clear the checkout flag after use
       localStorage.removeItem('checkoutFromCart');
-    } else if (buyNowItems) {
+    } else if (buyNowItems || isBuyNow) {
       try {
+        // Nếu có trạng thái isBuyNow từ React Router hoặc từ localStorage
         const items = JSON.parse(buyNowItems);
         
         // Kiểm tra xem items có đúng định dạng không
