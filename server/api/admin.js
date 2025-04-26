@@ -2172,7 +2172,6 @@ router.get('/statistics/export', JwtUtil.checkToken, async function (req, res) {
                     
                     // Vẽ văn bản
                     doc.fillColor(hasHeader && rowIndex === 0 ? '#000000' : '#333333')
-                      ```javascript
                        .font(hasHeader && rowIndex === 0 ? 'Bold' : 'Regular')
                        .fontSize(hasHeader && rowIndex === 0 ? 11 : 10)
                        .text(
@@ -2385,5 +2384,3 @@ router.post('/orders/:id/send-confirmation', JwtUtil.checkToken, async function 
 });
 
 module.exports = router;
-```
-
