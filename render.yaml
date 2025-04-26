@@ -1,5 +1,5 @@
 services:
-  - type: web
+  - type: web  
     name: webnangcao-api
     env: node
     buildCommand: cd server && npm install
@@ -39,7 +39,6 @@ services:
         fromEnvVar: SMTP_PASS
       - key: OPENAI_API_KEY
         fromEnvVar: OPENAI_API_KEY
-
   - type: web
     name: webnangcao-admin
     env: node
