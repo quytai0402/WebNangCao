@@ -95,6 +95,12 @@ class ProductSearch extends Component {
 
     handleBuyNow = async (product) => {
         try {
+            // Cuộn lên đầu trang với hiệu ứng mượt mà
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+            
             // Clear checkout from cart flag to avoid conflicts
             localStorage.removeItem('checkoutFromCart');
             
@@ -121,12 +127,9 @@ class ProductSearch extends Component {
             searchParams.append('action', 'buynow');
             searchParams.append('t', new Date().getTime());
             
-            // Use React Router's navigate with state for better reliability
-            this.props.navigate('/checkout', { 
-                state: { 
-                    buyNow: true, 
-                    timestamp: new Date().getTime() 
-                }
+            // Navigate to checkout page
+            this.props.navigate(`/checkout?${searchParams.toString()}`, {
+                state: { buyNow: true }
             });
         } catch (error) {
             console.error('Buy now error:', error);

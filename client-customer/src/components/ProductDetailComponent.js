@@ -189,6 +189,12 @@ class ProductDetail extends Component {
         const { product, quantity } = this.state;
 
         try {
+            // Cuộn lên đầu trang với hiệu ứng mượt mà
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+            
             // Clear checkout from cart flag to avoid conflicts
             localStorage.removeItem('checkoutFromCart');
             

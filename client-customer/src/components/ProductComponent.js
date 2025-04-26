@@ -106,6 +106,12 @@ class ProductComponent extends React.Component {
 
     handleBuyNow = async (product) => {
         try {
+            // Cuộn lên đầu trang với hiệu ứng mượt mà
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+            
             // Clear checkout from cart flag to avoid conflicts
             localStorage.removeItem('checkoutFromCart');
             
@@ -138,7 +144,7 @@ class ProductComponent extends React.Component {
             console.error('Buy now error:', error);
             toast.error('Có lỗi xảy ra khi mua ngay sản phẩm');
         }
-    };
+    }
 
     handleWishlistClick = async (productId) => {
         const { isLoggedIn, token } = this.props;
