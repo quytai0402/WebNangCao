@@ -1,12 +1,16 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { FaShoppingCart, FaShoppingBag, FaHeart, FaEye, FaFolder, FaStar, FaArrowRight } from 'react-icons/fa';
 import { toast } from 'react-toastify';
 import CartService from './services/CartService';
 import axios from 'axios';
 import '../styles/ProductComponent.css';
+import MyContext from '../contexts/MyContext';
+import withRouter from '../utils/withRouter';
 
 class ProductComponent extends React.Component {
+    static contextType = MyContext;
+
     constructor(props) {
         super(props);
         this.state = {
@@ -123,8 +127,8 @@ class ProductComponent extends React.Component {
             // Save to localStorage
             localStorage.setItem('buyNowItems', JSON.stringify(buyNowItems));
             
-            // Redirect to checkout page
-            window.location.href = '/checkout';
+            // Use React Router for navigation
+            this.props.navigate('/checkout');
         } catch (error) {
             console.error('Buy now error:', error);
             toast.error('Có lỗi xảy ra khi mua ngay sản phẩm');
@@ -509,4 +513,5 @@ class ProductComponent extends React.Component {
     }
 }
 
-export default ProductComponent;
+// Wrap with withRouter to get access to navigate function
+export default withRouter(ProductComponent);

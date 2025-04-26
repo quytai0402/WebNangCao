@@ -116,8 +116,8 @@ class ProductSearch extends Component {
             // Save to localStorage
             localStorage.setItem('buyNowItems', JSON.stringify(buyNowItems));
             
-            // Redirect to checkout page
-            window.location.href = '/checkout';
+            // Use React Router's navigate for smoother navigation
+            this.props.navigate('/checkout');
         } catch (error) {
             console.error('Buy now error:', error);
             toast.error('Có lỗi xảy ra khi xử lý đơn hàng');
