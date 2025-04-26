@@ -91,12 +91,26 @@ const CategoryDAO = {
     // Phương thức để xóa một danh mục theo ID
     async delete(categoryId) {
         try {
-            const result = await Models.Category.findByIdAndDelete(categoryId); // Xóa danh mục theo ID
+            // Trước tiên, kiểm tra xem có sản phẩm nào đang sử dụng danh mục này không
+            const mongoose = require('mongoose');
+            const objectCategoryId = new mongoose.Types.ObjectId(categoryId);
+            
+            // Đếm số lượng sản phẩm trong danh mục này
+            const productsCount = await Models.Product.countDocuments({ category: objectCategoryId });
+            
+            if (productsCount > 0) {
+                // Nếu có sản phẩm đang sử dụng danh mục, không cho phép xóa
+                throw new Error(`Không thể xóa danh mục này vì có ${productsCount} sản phẩm đang sử dụng. Vui lòng chuyển sản phẩm sang danh mục khác trước khi xóa.`);
+            }
+            
+            // Nếu không có sản phẩm liên quan, tiến hành xóa danh mục
+            const result = await Models.Category.findByIdAndDelete(categoryId);
             if (!result) {
                 throw new Error('Category not found'); // Ném lỗi nếu không tìm thấy danh mục
             }
             return result; // Trả về kết quả của việc xóa
         } catch (error) {
+            console.error('Error in CategoryDAO.delete:', error);
             throw new Error(`Error deleting category: ${error.message}`); // Ném lỗi
         }
     },
