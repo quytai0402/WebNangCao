@@ -308,7 +308,7 @@ class CheckoutComponent extends Component {
   fetchDistricts = async (provinceCode) => {
     this.setState({ isLoadingLocations: true, districts: [], wards: [], selectedDistrict: '', selectedWard: '' });
     try {
-      const response = await axios.get(`${this.context.apiUrl}/provinces/${provinceCode}`, {
+      const response = await axios.get(`${this.context.apiUrl}/customer/provinces/${provinceCode}`, {
         params: { depth: 2 }
       });
       this.setState({
@@ -327,7 +327,7 @@ class CheckoutComponent extends Component {
   fetchWards = async (districtCode) => {
     this.setState({ isLoadingLocations: true, wards: [], selectedWard: '' });
     try {
-      const response = await axios.get(`${this.context.apiUrl}/districts/${districtCode}`, {
+      const response = await axios.get(`${this.context.apiUrl}/customer/districts/${districtCode}`, {
         params: { depth: 2 }
       });
       this.setState({
