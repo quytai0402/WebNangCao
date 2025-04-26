@@ -172,6 +172,15 @@ router.delete('/categories/:id', JwtUtil.checkToken, async function (req, res) {
             message: 'Danh mục đã được xóa thành công'
         });
     } catch (error) {
+        console.error('Error deleting category:', error);
+        // Trả về mã lỗi 400 khi không thể xóa danh mục vì có sản phẩm liên kết
+        if (error.message && error.message.includes('Không thể xóa danh mục này vì có')) {
+            return res.status(400).json({
+                success: false,
+                message: error.message
+            });
+        }
+        
         res.json({
             success: false,
             message: error.message
@@ -1576,7 +1585,8 @@ router.post('/orders/:id/send-status-notification', JwtUtil.checkToken, async fu
                 const quantity = parseInt(item.quantity) || 1;
                 const price = parseFloat(item.price) || parseFloat(product.price) || 0;
                 
-                // Return complete product information
+                console.log(`Preparing status email item: ${product.name}, image: ${imageUrl}`);
+                
                 return {
                     product: {
                         _id: product._id.toString(),
@@ -1589,7 +1599,7 @@ router.post('/orders/:id/send-status-notification', JwtUtil.checkToken, async fu
                     totalPrice: price * quantity
                 };
             } catch (err) {
-                console.error(`Error processing item with product ID ${item.product}:`, err);
+                console.error(`Error processing product for status email:`, err);
                 return {
                     product: {
                         _id: typeof item.product === 'string' ? item.product : 'unknown',
@@ -1772,7 +1782,6 @@ router.post('/orders/:id/send-status-notification', JwtUtil.checkToken, async fu
         });
     }
 });
-// Add this route after your existing category routes
 
 // Route cập nhật danh mục
 router.put('/categories/:id', JwtUtil.checkToken, async function (req, res) {
@@ -1812,6 +1821,7 @@ router.put('/categories/:id', JwtUtil.checkToken, async function (req, res) {
         });
     }
 });
+
 // Route API thống kê cho dashboard
 router.get('/statistics', JwtUtil.checkToken, async function (req, res) {
     try {
@@ -2162,6 +2172,7 @@ router.get('/statistics/export', JwtUtil.checkToken, async function (req, res) {
                     
                     // Vẽ văn bản
                     doc.fillColor(hasHeader && rowIndex === 0 ? '#000000' : '#333333')
+                      ```javascript
                        .font(hasHeader && rowIndex === 0 ? 'Bold' : 'Regular')
                        .fontSize(hasHeader && rowIndex === 0 ? 11 : 10)
                        .text(
@@ -2194,305 +2205,6 @@ router.get('/statistics/export', JwtUtil.checkToken, async function (req, res) {
             });
         }
     }
-});
-
-// Thêm route để lấy sản phẩm theo ID
-router.get('/products/:id', JwtUtil.checkToken, async function (req, res) {
-    try {
-        const id = req.params.id;
-        console.log(`Admin API - Lấy thông tin sản phẩm với ID: ${id}`);
-
-        const product = await Models.Product.findById(id)
-            .populate('category', 'name')
-            .lean();
-
-        if (!product) {
-            return res.json({
-                success: false,
-                message: 'Không tìm thấy sản phẩm'
-            });
-        }
-
-        res.json({
-            success: true,
-            product: product
-        });
-    } catch (error) {
-        console.error('Lỗi khi lấy thông tin sản phẩm:', error);
-        res.json({
-            success: false,
-            message: error.message
-        });
-    }
-});
-
-// COMMENT API ROUTES FOR ADMIN
-
-// Lấy tất cả bình luận với phân trang
-router.get('/comments', JwtUtil.checkToken, async (req, res) => {
-  try {
-    const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 20;
-    
-    console.log('Admin API - Đang lấy bình luận trang:', page, 'giới hạn:', limit);
-    console.log('Người dùng từ token:', req.jwtDecoded);
-    
-    try {
-      const result = await CommentDAO.getAllComments(page, limit);
-      console.log('Lấy bình luận thành công, số lượng:', result.comments.length);
-      
-      return res.json({
-        success: true,
-        data: {
-          comments: result.comments || [],
-          pagination: {
-            total: result.pagination?.total || 0,
-            page: result.pagination?.page || page,
-            limit: result.pagination?.limit || limit,
-            pages: result.pagination?.pages || 1
-          }
-        }
-      });
-    } catch (commentsError) {
-      console.error('Lỗi khi lấy bình luận từ DAO:', commentsError);
-      return res.status(500).json({ 
-        success: false, 
-        message: 'Lỗi khi truy vấn cơ sở dữ liệu: ' + commentsError.message,
-        data: {
-          comments: [],
-          pagination: {
-            total: 0,
-            page: page,
-            limit: limit,
-            pages: 1
-          }
-        }
-      });
-    }
-  } catch (error) {
-    console.error('Lỗi khi lấy danh sách bình luận:', error);
-    return res.status(500).json({ 
-      success: false, 
-      message: 'Không thể lấy danh sách bình luận:',
-      error: error.message
-    });
-  }
-});
-
-// Lấy bình luận theo sản phẩm
-router.get('/comments/product/:productId', JwtUtil.checkToken, async (req, res) => {
-  try {
-    const { productId } = req.params;
-    const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 10;
-    
-    if (!mongoose.Types.ObjectId.isValid(productId)) {
-      return res.status(400).json({ success: false, message: 'ID sản phẩm không hợp lệ' });
-    }
-    
-    const result = await CommentDAO.getCommentsByProduct(productId, page, limit);
-    const rating = await CommentDAO.getProductRating(productId);
-    
-    res.json({
-      success: true,
-      data: {
-        comments: result.comments,
-        pagination: result.pagination,
-        rating
-      }
-    });
-  } catch (error) {
-    console.error('Lỗi khi lấy bình luận theo sản phẩm:', error);
-    res.status(500).json({ success: false, message: 'Không thể lấy bình luận theo sản phẩm', error: error.message });
-  }
-});
-
-// Lấy danh sách trả lời cho một bình luận
-router.get('/comments/replies/:commentId', JwtUtil.checkToken, async (req, res) => {
-  try {
-    const { commentId } = req.params;
-    
-    if (!mongoose.Types.ObjectId.isValid(commentId)) {
-      return res.status(400).json({ success: false, message: 'ID bình luận không hợp lệ' });
-    }
-    
-    // Kiểm tra bình luận tồn tại
-    const comment = await CommentDAO.getCommentById(commentId);
-    if (!comment) {
-      return res.status(404).json({ success: false, message: 'Không tìm thấy bình luận' });
-    }
-    
-    // Lấy danh sách trả lời
-    const replies = await CommentDAO.getRepliesByParentId(commentId);
-    
-    res.json({
-      success: true,
-      data: {
-        replies,
-        parentComment: comment
-      }
-    });
-  } catch (error) {
-    console.error('Lỗi khi lấy danh sách trả lời bình luận:', error);
-    res.status(500).json({ 
-      success: false, 
-      message: 'Không thể lấy danh sách trả lời bình luận', 
-      error: error.message,
-      data: {
-        replies: []
-      }
-    });
-  }
-});
-
-// Xem chi tiết bình luận
-router.get('/comments/:id', JwtUtil.checkToken, async (req, res) => {
-  try {
-    const { id } = req.params;
-    
-    if (!mongoose.Types.ObjectId.isValid(id)) {
-      return res.status(400).json({ success: false, message: 'ID bình luận không hợp lệ' });
-    }
-    
-    const comment = await CommentDAO.getCommentById(id);
-    
-    if (!comment) {
-      return res.status(404).json({ success: false, message: 'Không tìm thấy bình luận' });
-    }
-    
-    res.json({
-      success: true,
-      data: comment
-    });
-  } catch (error) {
-    console.error('Lỗi khi lấy chi tiết bình luận:', error);
-    res.status(500).json({ success: false, message: 'Không thể lấy chi tiết bình luận', error: error.message });
-  }
-});
-
-// Trả lời bình luận với tư cách admin
-router.post('/comments/reply/:id', JwtUtil.checkToken, async (req, res) => {
-  try {
-    const { id } = req.params;
-    const { content } = req.body;
-    
-    if (!mongoose.Types.ObjectId.isValid(id)) {
-      return res.status(400).json({ success: false, message: 'ID bình luận không hợp lệ' });
-    }
-    
-    // Kiểm tra bình luận cha tồn tại
-    const parentComment = await CommentDAO.getCommentById(id);
-    
-    if (!parentComment) {
-      return res.status(404).json({ success: false, message: 'Không tìm thấy bình luận cha' });
-    }
-    
-    if (!content || content.trim() === '') {
-      return res.status(400).json({ success: false, message: 'Nội dung bình luận không được để trống' });
-    }
-    
-    // Tạo tài khoản admin giả tạm thời
-    const adminCustomer = await Models.Customer.findOne({ username: 'admin' });
-    
-    let adminCustomerId;
-    
-    if (!adminCustomer) {
-      // Nếu chưa có tài khoản admin, tạo mới
-      const newAdminCustomer = new Models.Customer({
-        username: 'admin',
-        name: 'Quản trị viên',
-        phone: '0000000000',
-        email: 'admin@example.com',
-        isAdmin: true
-      });
-      
-      await newAdminCustomer.save();
-      adminCustomerId = newAdminCustomer._id;
-    } else {
-      adminCustomerId = adminCustomer._id;
-    }
-    
-    // Tạo bình luận với tư cách admin
-    const commentData = {
-      product: parentComment.product,
-      customer: adminCustomerId,
-      content,
-      parentId: id
-    };
-    
-    const comment = await CommentDAO.createComment(commentData);
-    
-    res.status(201).json({
-      success: true,
-      message: 'Đã trả lời bình luận thành công',
-      data: comment
-    });
-  } catch (error) {
-    console.error('Lỗi khi trả lời bình luận:', error);
-    res.status(500).json({ success: false, message: 'Không thể trả lời bình luận', error: error.message });
-  }
-});
-
-// Xóa bình luận
-router.delete('/comments/:id', JwtUtil.checkToken, async (req, res) => {
-  try {
-    const { id } = req.params;
-    
-    if (!mongoose.Types.ObjectId.isValid(id)) {
-      return res.status(400).json({ 
-        success: false, 
-        message: 'ID bình luận không hợp lệ',
-        error: 'INVALID_ID' 
-      });
-    }
-    
-    const comment = await CommentDAO.getCommentById(id);
-    
-    if (!comment) {
-      return res.status(404).json({ 
-        success: false, 
-        message: 'Không tìm thấy bình luận',
-        error: 'COMMENT_NOT_FOUND'
-      });
-    }
-    
-    // Kiểm tra xem có bao nhiêu trả lời sẽ bị xóa
-    let replyCount = 0;
-    if (comment.replies && comment.replies.length > 0) {
-      replyCount = comment.replies.length;
-    }
-    
-    const deletedComment = await CommentDAO.deleteComment(id);
-    
-    if (!deletedComment) {
-      return res.status(500).json({ 
-        success: false, 
-        message: 'Không thể xóa bình luận',
-        error: 'DELETE_FAILED'
-      });
-    }
-    
-    // Trả về thông tin chi tiết về những gì đã được xóa
-    res.json({
-      success: true,
-      message: replyCount > 0 
-        ? `Bình luận và ${replyCount} trả lời đã được xóa thành công`
-        : 'Bình luận đã được xóa thành công',
-      data: {
-        deletedCommentId: id,
-        replyCount,
-        wasReply: comment.parentId ? true : false,
-        parentId: comment.parentId || null
-      }
-    });
-  } catch (error) {
-    console.error('Lỗi khi xóa bình luận:', error);
-    res.status(500).json({ 
-      success: false, 
-      message: 'Không thể xóa bình luận: ' + (error.message || 'Lỗi không xác định'),
-      error: 'SERVER_ERROR'
-    });
-  }
 });
 
 // Thêm hàm tính tổng đơn hàng để đảm bảo có giá trị total
@@ -2673,4 +2385,5 @@ router.post('/orders/:id/send-confirmation', JwtUtil.checkToken, async function 
 });
 
 module.exports = router;
+```
 
